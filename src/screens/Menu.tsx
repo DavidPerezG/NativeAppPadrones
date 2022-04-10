@@ -1,28 +1,23 @@
+// External dependencies
 import {
   StyleSheet,
   View,
-  Text,
-  TouchableWithoutFeedback,
-  Image,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React from 'react';
+import { useSelector } from 'react-redux';
 
-import {useNavigation} from '@react-navigation/native';
-
+// Internal dependencies
 import Header from '../components/Header';
 import MenuCard from '../components/MenuCard';
 
-const Menu = props => {
-  const navigation = useNavigation();
+const Menu = () => {
+  // Redux
+  // @ts-ignore
+  const hasCorte = useSelector(state => Boolean(state.user.corte));
 
-  useEffect(() => {
-    if (global.token === '') {
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'login'}],
-      });
-    }
-  }, []);
+  // Build data
+  const activeColor = '#3F3F3F';
+  const disableColor = '#aaaaaa';
 
   return (
     <View>
@@ -34,11 +29,18 @@ const Menu = props => {
           col="#3F3F3F"
           navPage="caja"
         />
-        <MenuCard nombreItem="Abrir Corte" iconName="coins" col="#3F3F3F" />
+
+        <MenuCard
+          nombreItem="Abrir Corte"
+          iconName="coins"
+          col={!hasCorte ? activeColor : disableColor}
+          navPage="abrir-corte"
+        />
+
         <MenuCard
           nombreItem="Cerrar Corte"
           iconName="window-close"
-          col="#3F3F3F"
+          col={hasCorte ? activeColor : disableColor}
         />
       </View>
       <View style={styles.row}>
