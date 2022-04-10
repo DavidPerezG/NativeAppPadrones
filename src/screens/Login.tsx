@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+// External dependencies
+import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {
   View,
@@ -7,57 +8,69 @@ import {
   Image,
   TextInput,
   Pressable,
-  AsyncStorage,
   Modal,
+  ActivityIndicator,
 } from 'react-native';
-
-import ModalInfo from '../components/ModalInfo';
-
-import axios from 'axios';
-
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import {useDispatch} from 'react-redux';
 
-let axiosConfig = {
-  headers: {
-    'Content-Type': 'application/json;charset=UTF-8',
-    'Access-Control-Allow-Origin': '*',
-  },
-};
+// Internal dependencies
+import { login } from '../services/auth';
+import { dispatchClearAuth, dispatchLogin } from '../store/actions/auth';
 
 const Login = () => {
+  // Component's state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secure, setSecure] = useState(true);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
+  // Redux
+  const dispatch = useDispatch();
+
+  // Navigation
   const navigation = useNavigation();
 
-  const onPressLoginHandle = () => {
-    const url = 'https://apigrp.migob.mx/usuarios/login/';
+  // Effects
+  useEffect(() => {
+    dispatchClearAuth(dispatch);
+  }, []);
 
-    if (email === '' || password === '') {
+  /**
+   * Handle the login button press
+   */
+  const onPressLoginHandle = async () => {
+    setLoading(true);
+
+    // Sanitaze inputs
+    const emailSanitized = email.replace(/\s/g, '');
+
+    // Validate inputs
+    if (!emailSanitized || !password) {
       setModalMessage('Los campos no deben estar en blanco');
       setModalVisibility(true);
+      setLoading(false);
       return;
     }
 
-    const body = {email, password};
-    axios
-      .post(url, body, axiosConfig)
-      .then(response => {
-        const result = response.data;
-        const {refresh, access, last_login} = result;
-        global.token = `Bearer ${result.access}`;
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'menu'}],
-        });
-      })
-      .catch(error => {
-        setModalMessage('Credenciales Incorrectas');
-        setModalVisibility(true);
+    const loginResponse = await login(emailSanitized, password);
+
+    if (Object.prototype.hasOwnProperty.call(loginResponse, 'access')) {
+      dispatchLogin(dispatch, loginResponse);
+
+      navigation.reset({
+        index: 0,
+        routes: [{
+          // @ts-ignore
+          name: 'loading',
+        }],
       });
+      return;
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -115,8 +128,15 @@ const Login = () => {
         <Pressable
           onPress={onPressLoginHandle}
           style={styles.button}
-          android_ripple={{backgroundColor: 'green'}}>
-          <Text style={styles.iniciarText}>Iniciar Sesión</Text>
+          android_ripple={{color: 'green'}}
+          disabled={loading}>
+            {
+              loading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.iniciarText}>Iniciar Sesión</Text>
+              )
+            }
         </Pressable>
       </View>
       <Modal
@@ -204,6 +224,7 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingHorizontal: 70,
     borderRadius: 50,
+    minWidth: 200,
   },
   iniciarText: {
     color: 'white',

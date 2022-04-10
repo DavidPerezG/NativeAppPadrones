@@ -1,3 +1,4 @@
+// Internal dependencies
 import {HTTP} from './http';
 
 const login = async (email, password) => {
