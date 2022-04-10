@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 import {store} from '../store';
-import {dispatchClearAuth, dispatchSetToken} from '../store/actions/auth';
+import {dispatchClearAuth, dispatchSetAccessToken} from '../store/actions/auth';
 import {navigateWithReset} from '../utils/navigation';
 
 // Configuration
@@ -22,7 +22,7 @@ export const HTTP = axios.create(httpConfig);
 
 // Interceptors
 const onSendRequest = config => {
-  const token = store.getState()?.auth?.accessToken;
+  const token = store.getState()?.auth?.access;
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -31,7 +31,7 @@ const onSendRequest = config => {
   return config;
 };
 
-const refreshToken = async token => {
+export const refreshToken = async token => {
   try {
     const response = await axios.post(
       `${httpConfig.baseURL}usuarios/refresh-token/`,
@@ -55,20 +55,20 @@ const onResponseFail = async error => {
     statusCode === 401 &&
     (/autenticación/gi.test(data?.detail) || data?.code === 'token_not_valid')
   ) {
-    const refresh = store.getState()?.auth?.refreshToken;
+    const refresh = store.getState()?.auth?.refresh;
 
     if (refresh) {
       const newToken = await refreshToken(refresh);
 
       if (newToken) {
-        dispatchSetToken(store.dispatch, newToken);
+        dispatchSetAccessToken(store.dispatch, newToken);
         const {config} = error;
         config.headers.Authorization = `Bearer ${newToken}`;
         return axios.request(config);
       }
       // If token fails redirect user to login screen
       dispatchClearAuth(store.dispatch);
-      return navigateWithReset('auth');
+      return navigateWithReset('login');
     }
   }
 

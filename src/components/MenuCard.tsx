@@ -1,8 +1,12 @@
-import React, {useState, useEffect} from 'react';
+// Internal dependencies
+import React, {useState} from 'react';
 import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { useDispatch } from 'react-redux';
+
+// External dependencies
+import { dispatchClearAuth } from '../store/actions/auth';
 
 const MenuCard = props => {
   const [isBlank, blank] = useState(props.isBlank);
@@ -10,9 +14,12 @@ const MenuCard = props => {
 
   const navigation = useNavigation();
 
+  const dispatch = useDispatch();
+
   const handleClick = () => {
     if (props.navPage === 'login') {
-      global.token = '';
+      dispatchClearAuth(dispatch);
+
       navigation.reset({
         index: 0,
         routes: [{name: props.navPage}],
@@ -40,7 +47,7 @@ const MenuCard = props => {
           solid
           color={props.col}
         />
-        <Text style={styles.text}>{props.nombreItem}</Text>
+        <Text style={[styles.text, { color: props.col }]}>{props.nombreItem}</Text>
       </View>
     </TouchableWithoutFeedback>
   );
