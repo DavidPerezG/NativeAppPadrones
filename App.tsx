@@ -16,6 +16,7 @@ import Caja from './src/screens/Caja';
 import LoadingScreen from './src/screens/Loading';
 import AbrirCorteScreen from './src/screens/AbrirCorte';
 import ProfileScreen from './src/screens/Profile';
+import DetalleDeCorteScreen from './src/screens/DetalleDeCorte';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -31,6 +32,7 @@ const AppContainer = () => (
       <Stack.Screen name="caja" component={Caja} />
       <Stack.Screen name="abrir-corte" component={AbrirCorteScreen} />
       <Stack.Screen name="profile" component={ProfileScreen} />
+      <Stack.Screen name="detalle-de-corte" component={DetalleDeCorteScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

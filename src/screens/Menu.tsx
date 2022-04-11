@@ -31,13 +31,14 @@ const Menu = () => {
           nombreItem="Abrir Corte"
           iconName="coins"
           col={!hasCorte ? activeColor : disableColor}
-          navPage="abrir-corte"
+          navPage={!hasCorte ? 'abrir-corte' : undefined}
         />
 
         <MenuCard
           nombreItem="Cerrar Corte"
           iconName="window-close"
           col={hasCorte ? activeColor : disableColor}
+          navPage={hasCorte ? 'detalle-de-corte' : undefined}
         />
       </View>
       <View style={styles.row}>

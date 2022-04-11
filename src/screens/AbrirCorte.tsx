@@ -2,16 +2,18 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useDispatch} from 'react-redux';
+import {ActivityIndicator, TouchableWithoutFeedback} from 'react-native';
 
 // Internal dependencies
 import Header from '../components/Header';
 import fonts from '../utils/fonts';
 import ModalPicker from '../components/ModalPicker';
 import {getUnidadesDeRecaudacion} from '../services/configuracion';
-import {ActivityIndicator, TouchableWithoutFeedback} from 'react-native';
 import {abrirCorte} from '../services/recaudacion';
 import {dispatchSetCorte} from '../store/actions/user';
 import ModalMessage from '../components/ModalMessage';
+import {useNavigation} from '@react-navigation/native';
 
 const AbrirCorteScreen = () => {
   // Component's state
@@ -23,6 +25,12 @@ const AbrirCorteScreen = () => {
 
   const [isFetching, setIsFetching] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Navigation
+  const navigation = useNavigation();
+
+  // Redux
+  const dispatch = useDispatch();
 
   // Effects
   useEffect(() => {
@@ -49,7 +57,7 @@ const AbrirCorteScreen = () => {
     setUnidadDeRecaudacion(item);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setIsLoading(true);
 
     // validate total
@@ -62,10 +70,15 @@ const AbrirCorteScreen = () => {
     }
 
     // @ts-ignore
-    const response = abrirCorte(total, unidadDeRecaudacion.id);
+    const response = await abrirCorte(total, unidadDeRecaudacion.id);
 
     if (response) {
-      dispatchSetCorte(response);
+      dispatchSetCorte(dispatch, response);
+      navigation.reset({
+        index: 0,
+        // @ts-ignore
+        routes: [{name: 'menu'}],
+      });
     }
 
     setIsLoading(false);
