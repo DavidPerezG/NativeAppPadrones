@@ -44,7 +44,13 @@ const Menu = () => {
         />
       </View>
       <View style={styles.row}>
-        <MenuCard nombreItem="Mi Perfil" iconName="user-alt" col="#3F3F3F" />
+        <MenuCard
+          nombreItem="Mi
+          Perfil"
+          iconName="user-alt"
+          col="#3F3F3F"
+          navPage="profile"
+        />
         <MenuCard
           nombreItem="Cerrar Sesión"
           iconName="door-open"

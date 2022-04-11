@@ -20,8 +20,8 @@ import { dispatchClearAuth, dispatchLogin } from '../store/actions/auth';
 
 const Login = () => {
   // Component's state
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('carlos.iturrios@nayarit.com.mx');
+  const [password, setPassword] = useState('sigob2020');
   const [secure, setSecure] = useState(true);
   const [modalVisibility, setModalVisibility] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
