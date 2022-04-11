@@ -11,13 +11,15 @@ import { getUnidadesDeRecaudacion } from '../services/configuracion';
 import { ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
 import { abrirCorte } from '../services/recaudacion';
 import { dispatchSetCorte } from '../store/actions/user';
+import ModalMessage from '../components/ModalMessage';
 
 const AbrirCorteScreen = () => {
   // Component's state
   const [unidadesDeRecaudacion, setUnidadesDeRecaudacion] = useState([]);
   const [unidadDeRecaudacion, setUnidadDeRecaudacion] = useState();
-  const [total, setTotal] = useState<string>();
+  const [total, setTotal] = useState<string>('');
   const [showPicker, setShowPicker] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const [isFetching, setIsFetching] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +56,8 @@ const AbrirCorteScreen = () => {
     const regexFloatOrInt = /^\d+(\.\d{1,2})?$/;
 
     if (!unidadDeRecaudacion || !regexFloatOrInt.test(total)) {
+      setErrorMessage('Error de captura, verifique los datos');
+      setIsLoading(false);
       return;
     }
 
@@ -141,6 +145,11 @@ const AbrirCorteScreen = () => {
         value={unidadDeRecaudacion}
         onSelect={onSelect}
         options={pickerOptions}
+      />
+
+      <ModalMessage
+        message={errorMessage}
+        clearMessage={() => setErrorMessage('')}
       />
     </>
   );

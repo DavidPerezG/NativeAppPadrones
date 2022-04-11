@@ -12,24 +12,6 @@ const ProfileScreen = () => {
   // @ts-ignore
   const user = useSelector(state => state.user);
 
-  const getNames = () => {
-    let output = '';
-
-    if (user?.first_name) {
-      output += user.first_name;
-    }
-
-    if (user?.last_name) {
-      output += (output ? ' ': '') + user.last_name;
-    }
-
-    if (user?.second_last_name) {
-      output += (output ? ' ': '') + user.second_last_name;
-    }
-
-    return output;
-  };
-
   return (
     <Container>
       <AvatarContainer>
