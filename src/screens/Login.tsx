@@ -15,16 +15,16 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch} from 'react-redux';
 
 // Internal dependencies
+import ModalMessage from '../components/ModalMessage';
 import { login } from '../services/auth';
 import { dispatchClearAuth, dispatchLogin } from '../store/actions/auth';
 
 const Login = () => {
   // Component's state
-  const [email, setEmail] = useState('carlos.iturrios@nayarit.com.mx');
-  const [password, setPassword] = useState('sigob2020');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [secure, setSecure] = useState(true);
-  const [modalVisibility, setModalVisibility] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Redux
@@ -49,8 +49,7 @@ const Login = () => {
 
     // Validate inputs
     if (!emailSanitized || !password) {
-      setModalMessage('Los campos no deben estar en blanco');
-      setModalVisibility(true);
+      setErrorMessage('Los campos no deben estar en blanco');
       setLoading(false);
       return;
     }
@@ -139,25 +138,11 @@ const Login = () => {
             }
         </Pressable>
       </View>
-      <Modal
-        visible={modalVisibility}
-        transparent
-        onRequestClose={() => {
-          setModalVisibility(false);
-        }}>
-        <View style={styles.centeredModal}>
-          <View style={styles.modal}>
-            <Text style={styles.message}>{modalMessage}</Text>
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => {
-                setModalVisibility(false);
-              }}>
-              <Text style={{color: 'black'}}>Entendido</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+
+      <ModalMessage
+        message={errorMessage}
+        clearMessage={() => setErrorMessage('')}
+      />
     </>
   );
 };
