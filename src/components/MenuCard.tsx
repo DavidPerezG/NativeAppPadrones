@@ -1,7 +1,7 @@
 // Internal dependencies
-import React, {useState} from 'react';
-import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch } from 'react-redux';
 
@@ -22,7 +22,7 @@ const MenuCard = props => {
 
       navigation.reset({
         index: 0,
-        routes: [{name: props.navPage}],
+        routes: [{ name: props.navPage }],
       });
     } else {
       props.navPage ? navigation.push(props.navPage) : false;
@@ -33,13 +33,13 @@ const MenuCard = props => {
     return (
       <View
         handleEvent={blank}
-        style={{...styles.squareStyleBlank, ...props.style}}
+        style={{ ...styles.squareStyleBlank, ...props.style }}
       />
     );
   }
   return (
     <TouchableWithoutFeedback onPress={handleClick}>
-      <View style={{...styles.squareStyle, ...props.style}}>
+      <View style={{ ...styles.squareStyle, ...props.style }}>
         <FontAwesome5
           name={props.iconName}
           size={40}
@@ -56,17 +56,17 @@ const MenuCard = props => {
 const styles = StyleSheet.create({
   squareStyle: {
     borderRadius: 5,
-    width: 120,
+    width: 110,
     height: 120,
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'black',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowRadius: 7,
     shadowOpacity: 0.09,
     elevation: 5,
-    marginHorizontal: 0,
+    margin: 3,
   },
   squareStyleBlank: {
     borderRadius: 5,

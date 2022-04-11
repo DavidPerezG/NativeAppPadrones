@@ -277,6 +277,9 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    implementation 'com.gitlab.netpaymx.netpay-sdks:smart-sdk:V1.1.5'
+
 }
 
 if (isNewArchitectureEnabled()) {

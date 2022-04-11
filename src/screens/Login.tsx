@@ -1,6 +1,6 @@
 // External dependencies
-import React, {useEffect, useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import {useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // Internal dependencies
 import { login } from '../services/auth';
@@ -56,21 +56,27 @@ const Login = () => {
     }
 
     const loginResponse = await login(emailSanitized, password);
+    console.log("este es el log " + loginResponse);
 
-    if (Object.prototype.hasOwnProperty.call(loginResponse, 'access')) {
-      dispatchLogin(dispatch, loginResponse);
+    if (loginResponse === null) {
+      setLoading(false);
+    } else {
 
-      navigation.reset({
-        index: 0,
-        routes: [{
-          // @ts-ignore
-          name: 'loading',
-        }],
-      });
-      return;
+      if (Object.prototype.hasOwnProperty.call(loginResponse, 'access')) {
+        dispatchLogin(dispatch, loginResponse);
+
+        navigation.reset({
+          index: 0,
+          routes: [{
+            // @ts-ignore
+            name: 'loading',
+          }],
+        });
+        return;
+      }
+
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -97,6 +103,7 @@ const Login = () => {
             />
           </View>
         </View>
+
         <View style={styles.inputContainer}>
           <Text style={styles.inputTitle}>Contraseña</Text>
           <View style={styles.inputSpace}>
@@ -124,21 +131,24 @@ const Login = () => {
             />
           </View>
         </View>
+
         <Text style={styles.olvidoText}>¿Olvidó su contraseña?</Text>
+
         <Pressable
           onPress={onPressLoginHandle}
           style={styles.button}
-          android_ripple={{color: 'green'}}
+          android_ripple={{ color: 'green' }}
           disabled={loading}>
-            {
-              loading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
+          {
+            loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
                 <Text style={styles.iniciarText}>Iniciar Sesión</Text>
               )
-            }
+          }
         </Pressable>
       </View>
+
       <Modal
         visible={modalVisibility}
         transparent
@@ -153,7 +163,7 @@ const Login = () => {
               onPress={() => {
                 setModalVisibility(false);
               }}>
-              <Text style={{color: 'black'}}>Entendido</Text>
+              <Text style={{ color: 'black' }}>Entendido</Text>
             </Pressable>
           </View>
         </View>
