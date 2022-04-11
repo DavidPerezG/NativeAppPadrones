@@ -1,3 +1,4 @@
+// External dependencies
 import {
   StyleSheet,
   View,
@@ -6,15 +7,37 @@ import {
   Image,
 } from 'react-native';
 import React from 'react';
-
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const Header = ({title}) => {
+// Interfaces & Types
+interface IHeaderProps {
+  title: string;
+  isGoBack?: boolean;
+  onPressLeftButton?: () => void;
+  disableLeftButton?: boolean;
+}
+
+const Header = ({
+  title,
+  isGoBack,
+  onPressLeftButton,
+  disableLeftButton,
+}: IHeaderProps) => {
   return (
     <View style={styles.header}>
-      <View style={styles.logoContainer}>
-        <Icon style={styles.navIcon} name="bars" size={30} color="white" />
-      </View>
+      <TouchableWithoutFeedback
+        onPress={onPressLeftButton}
+        disabled={disableLeftButton}>
+        <View style={styles.logoContainer}>
+          <Icon
+            style={styles.navIcon}
+            name={!isGoBack ? 'bars' : 'chevron-left'}
+            size={!isGoBack ? 30 : 25}
+            color="white"
+          />
+        </View>
+      </TouchableWithoutFeedback>
+
       <View style={styles.textContainer}>
         <Text style={styles.tituloHeader}>{title}</Text>
       </View>
@@ -59,6 +82,8 @@ const styles = StyleSheet.create({
     height: 41,
     width: 41,
     borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   notifContainer: {
     height: 35,

@@ -5,4 +5,5 @@ export type RootStackParamList = {
   caja: undefined;
   'abrir-corte': undefined;
   profile: undefined;
+  'detalle-de-corte': undefined;
 };

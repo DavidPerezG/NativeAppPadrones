@@ -20,8 +20,8 @@ import {dispatchClearAuth, dispatchLogin} from '../store/actions/auth';
 
 const Login = () => {
   // Component's state
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('carlos.iturrios@nayarit.com.mx');
+  const [password, setPassword] = useState('sigob2020');
   const [secure, setSecure] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -56,7 +56,10 @@ const Login = () => {
 
     const loginResponse = await login(emailSanitized, password);
 
-    if (Object.prototype.hasOwnProperty.call(loginResponse, 'access')) {
+    if (
+      loginResponse &&
+      Object.prototype.hasOwnProperty.call(loginResponse, 'access')
+    ) {
       dispatchLogin(dispatch, loginResponse);
 
       navigation.reset({

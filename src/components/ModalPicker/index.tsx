@@ -34,7 +34,7 @@ const ModalPicker: React.FC<ModalPickerProps> = ({
           {options.map((item, index) => (
             <>
               <ListItem
-                key={item.label.toString()}
+                key={item.label.toString() + index.toString()}
                 text={item.label}
                 isSelected={item.value === value}
                 onPress={() => {
