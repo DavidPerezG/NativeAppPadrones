@@ -9,7 +9,7 @@ const login = async (email, password) => {
     });
     return response?.data?.access ? response?.data : null;
   } catch (error) {
-    console.error(error, error?.response?.data?.detail);
+    console.error(error, error?.response?.data);
   }
   return null;
 };

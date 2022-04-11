@@ -18,6 +18,8 @@ import AbrirCorteScreen from './src/screens/AbrirCorte';
 import BusquedaPadron from './src/screens/BusquedaPadron';
 import CargosPadrones from './src/screens/CargosPadrones';
 import DetallesPadron from './src/screens/DetallasPadron';
+import ProfileScreen from './src/screens/Profile';
+import DetalleDeCorteScreen from './src/screens/DetalleDeCorte';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -35,6 +37,8 @@ const AppContainer = () => (
       <Stack.Screen name="busqueda-padron" component={BusquedaPadron} />
       <Stack.Screen name="cargosPadrones" component={CargosPadrones} />
       <Stack.Screen name="detallesPadron" component={DetallesPadron} />
+      <Stack.Screen name="profile" component={ProfileScreen} />
+      <Stack.Screen name="detalle-de-corte" component={DetalleDeCorteScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );
@@ -46,5 +50,5 @@ export default () => {
         <AppContainer />
       </PersistGate>
     </Provider>
-  )
+  );
 };

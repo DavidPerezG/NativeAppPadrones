@@ -13,7 +13,7 @@ const setNotification = (state, action) => {
   };
 };
 
-const clearNotification = (state) => ({
+const clearNotification = state => ({
   ...state,
   notification: {
     type: null,

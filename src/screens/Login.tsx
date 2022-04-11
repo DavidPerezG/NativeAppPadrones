@@ -8,23 +8,22 @@ import {
   Image,
   TextInput,
   Pressable,
-  Modal,
   ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { useDispatch } from 'react-redux';
 
 // Internal dependencies
+import ModalMessage from '../components/ModalMessage';
 import { login } from '../services/auth';
 import { dispatchClearAuth, dispatchLogin } from '../store/actions/auth';
 
 const Login = () => {
   // Component's state
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('carlos.iturrios@nayarit.com.mx');
+  const [password, setPassword] = useState('sigob2020');
   const [secure, setSecure] = useState(true);
-  const [modalVisibility, setModalVisibility] = useState(false);
-  const [modalMessage, setModalMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Redux
@@ -36,6 +35,7 @@ const Login = () => {
   // Effects
   useEffect(() => {
     dispatchClearAuth(dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -49,8 +49,7 @@ const Login = () => {
 
     // Validate inputs
     if (!emailSanitized || !password) {
-      setModalMessage('Los campos no deben estar en blanco');
-      setModalVisibility(true);
+      setErrorMessage('Los campos no deben estar en blanco');
       setLoading(false);
       return;
     }
@@ -58,118 +57,112 @@ const Login = () => {
     const loginResponse = await login(emailSanitized, password);
     console.log("este es el log " + loginResponse);
 
-    if (loginResponse === null) {
-      setLoading(false);
-    } else {
+    if (
+      loginResponse &&
+      Object.prototype.hasOwnProperty.call(loginResponse, 'access')
+    ) {
+      dispatchLogin(dispatch, loginResponse);
 
-      if (Object.prototype.hasOwnProperty.call(loginResponse, 'access')) {
-        dispatchLogin(dispatch, loginResponse);
-
-        navigation.reset({
-          index: 0,
-          routes: [{
+      navigation.reset({
+        index: 0,
+        routes: [
+          {
             // @ts-ignore
             name: 'loading',
-          }],
-        });
-        return;
-      }
-
-      setLoading(false);
+          },
+        ],
+      });
+      return;
     }
+
+    navigation.reset({
+      index: 0,
+      routes: [{
+        // @ts-ignore
+        name: 'loading',
+      }],
+    });
+    return;
+  }
+
+  setLoading(false);
+}
   };
 
-  return (
-    <>
-      <View style={styles.container}>
-        <Image source={require('../../assets/imagenes/logo.png')} />
-        <Text style={styles.welcomeText}>Bienvenido</Text>
+return (
+  <>
+    <View style={styles.container}>
+      <Image source={require('../../assets/imagenes/logo.png')} />
+      <Text style={styles.welcomeText}>Bienvenido</Text>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>Correo</Text>
-          <View style={styles.inputSpace}>
-            <Icon
-              style={styles.icons}
-              name="envelope"
-              size={16}
-              color="gray"
-              onPress={() => setSecure(!secure)}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Correo Electrónico"
-              value={email}
-              onChangeText={text => setEmail(text)}
-            />
-          </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputTitle}>Correo</Text>
+        <View style={styles.inputSpace}>
+          <Icon
+            style={styles.icons}
+            name="envelope"
+            size={16}
+            color="gray"
+            onPress={() => setSecure(!secure)}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Correo Electrónico"
+            value={email}
+            onChangeText={text => setEmail(text)}
+          />
         </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputTitle}>Contraseña</Text>
-          <View style={styles.inputSpace}>
-            <Icon
-              style={styles.icons}
-              name="lock"
-              size={16}
-              color="gray"
-              onPress={() => setSecure(!secure)}
-            />
-            <TextInput
-              style={styles.input}
-              autoCorrect={false}
-              secureTextEntry={secure}
-              placeholder="Contraseña"
-              value={password}
-              onChangeText={text => setPassword(text)}
-            />
-            <Icon
-              style={styles.iconsEye}
-              name={secure ? 'eye' : 'eye-slash'}
-              size={16}
-              color="gray"
-              onPress={() => setSecure(!secure)}
-            />
-          </View>
-        </View>
-
-        <Text style={styles.olvidoText}>¿Olvidó su contraseña?</Text>
-
-        <Pressable
-          onPress={onPressLoginHandle}
-          style={styles.button}
-          android_ripple={{ color: 'green' }}
-          disabled={loading}>
-          {
-            loading ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-                <Text style={styles.iniciarText}>Iniciar Sesión</Text>
-              )
-          }
-        </Pressable>
       </View>
 
-      <Modal
-        visible={modalVisibility}
-        transparent
-        onRequestClose={() => {
-          setModalVisibility(false);
-        }}>
-        <View style={styles.centeredModal}>
-          <View style={styles.modal}>
-            <Text style={styles.message}>{modalMessage}</Text>
-            <Pressable
-              style={styles.modalButton}
-              onPress={() => {
-                setModalVisibility(false);
-              }}>
-              <Text style={{ color: 'black' }}>Entendido</Text>
-            </Pressable>
-          </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputTitle}>Contraseña</Text>
+        <View style={styles.inputSpace}>
+          <Icon
+            style={styles.icons}
+            name="lock"
+            size={16}
+            color="gray"
+            onPress={() => setSecure(!secure)}
+          />
+          <TextInput
+            style={styles.input}
+            autoCorrect={false}
+            secureTextEntry={secure}
+            placeholder="Contraseña"
+            value={password}
+            onChangeText={text => setPassword(text)}
+          />
+          <Icon
+            style={styles.iconsEye}
+            name={secure ? 'eye' : 'eye-slash'}
+            size={16}
+            color="gray"
+            onPress={() => setSecure(!secure)}
+          />
         </View>
-      </Modal>
-    </>
-  );
+      </View>
+
+      <Text style={styles.olvidoText}>¿Olvidó su contraseña?</Text>
+
+      <Pressable
+        onPress={onPressLoginHandle}
+        style={styles.button}
+        android_ripple={{ color: 'green' }}
+        disabled={loading}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+            <Text style={styles.iniciarText}>Iniciar Sesión</Text>
+          )}
+      </Pressable>
+    </View>
+
+    <ModalMessage
+      message={errorMessage}
+      clearMessage={() => setErrorMessage('')}
+    />
+  </>
+);
 };
 
 export default Login;

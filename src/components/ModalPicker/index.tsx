@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  FlatList,
-} from 'react-native';
+import {ScrollView} from 'react-native';
 import styled from 'styled-components/native';
 import Modal from 'react-native-modal';
 import Header from './components/Header';
@@ -26,35 +24,38 @@ const ModalPicker: React.FC<ModalPickerProps> = ({
   onSelect,
   onClose,
   options,
-}) => (
-  <Modal
-    isVisible={isVisible}
-    style={{
-      padding: 0,
-      margin: 0,
-    }}
-  >
-    <Container>
+}) => {
+  return (
+    <StyledModal isVisible={isVisible}>
+      <Container>
+        <Header title={title} onClose={onClose} />
 
-      <Header title={title} onClose={onClose} />
+        <ScrollView>
+          {options.map((item, index) => (
+            <>
+              <ListItem
+                key={item.label.toString() + index.toString()}
+                text={item.label}
+                isSelected={item.value === value}
+                onPress={() => {
+                  onSelect(item.value);
+                  onClose();
+                }}
+              />
 
-      <FlatList
-        data={options}
-        ItemSeparatorComponent={() => <Separator />}
-        renderItem={({ item }) => (
-          <ListItem
-            text={item.label}
-            isSelected={item.value === value}
-            onPress={() => {
-              onSelect(item.value);
-              onClose();
-            }}
-          />
-        )}
-      />
-    </Container>
-  </Modal>
-);
+              {index < options.length - 1 && <Separator />}
+            </>
+          ))}
+        </ScrollView>
+      </Container>
+    </StyledModal>
+  );
+};
+
+const StyledModal = styled(Modal)`
+  padding: 0;
+  margin: 0;
+`;
 
 const Container = styled.View`
   flex: 1;

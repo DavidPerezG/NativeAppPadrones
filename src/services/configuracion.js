@@ -15,4 +15,18 @@ const getUnidadesDeRecaudacion = async () => {
   return [];
 };
 
-export {getUnidadesDeRecaudacion};
+const getMetodosDePago = async () => {
+  try {
+    const response = await HTTP.get(
+      'configuracion/catalogos-de-metodos-de-pagos/',
+    );
+    if (response?.data && Array.isArray(response.data)) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error(error, error?.response?.data?.detail);
+  }
+  return [];
+};
+
+export {getUnidadesDeRecaudacion, getMetodosDePago};

@@ -1,4 +1,4 @@
-type RootStackParamList = {
+export type RootStackParamList = {
   loading: undefined;
   menu: undefined;
   login: undefined;
@@ -8,3 +8,6 @@ type RootStackParamList = {
 };
 
 export type { RootStackParamList };
+profile: undefined;
+'detalle-de-corte': undefined;
+};

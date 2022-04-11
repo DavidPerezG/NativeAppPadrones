@@ -1,10 +1,7 @@
 // External dependencies
-import {
-  StyleSheet,
-  View,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import React from 'react';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 
 // Internal dependencies
 import Header from '../components/Header';
@@ -34,17 +31,24 @@ const Menu = () => {
           nombreItem="Abrir Corte"
           iconName="coins"
           col={!hasCorte ? activeColor : disableColor}
-          navPage="abrir-corte"
+          navPage={!hasCorte ? 'abrir-corte' : undefined}
         />
 
         <MenuCard
           nombreItem="Cerrar Corte"
           iconName="window-close"
           col={hasCorte ? activeColor : disableColor}
+          navPage={hasCorte ? 'detalle-de-corte' : undefined}
         />
       </View>
       <View style={styles.row}>
-        <MenuCard nombreItem="Mi Perfil" iconName="user-alt" col="#3F3F3F" />
+        <MenuCard
+          nombreItem="Mi
+          Perfil"
+          iconName="user-alt"
+          col="#3F3F3F"
+          navPage="profile"
+        />
         <MenuCard
           nombreItem="Cerrar Sesión"
           iconName="door-open"
