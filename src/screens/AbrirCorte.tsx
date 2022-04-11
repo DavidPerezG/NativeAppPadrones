@@ -1,16 +1,16 @@
 // External dependencies
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components/native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 // Internal dependencies
 import Header from '../components/Header';
 import fonts from '../utils/fonts';
 import ModalPicker from '../components/ModalPicker';
-import { getUnidadesDeRecaudacion } from '../services/configuracion';
-import { ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
-import { abrirCorte } from '../services/recaudacion';
-import { dispatchSetCorte } from '../store/actions/user';
+import {getUnidadesDeRecaudacion} from '../services/configuracion';
+import {ActivityIndicator, TouchableWithoutFeedback} from 'react-native';
+import {abrirCorte} from '../services/recaudacion';
+import {dispatchSetCorte} from '../store/actions/user';
 import ModalMessage from '../components/ModalMessage';
 
 const AbrirCorteScreen = () => {
@@ -35,7 +35,7 @@ const AbrirCorteScreen = () => {
     const response = await getUnidadesDeRecaudacion();
     setUnidadesDeRecaudacion(response);
     setIsFetching(false);
-  }
+  };
 
   const pickerOptions = useMemo(() => {
     return unidadesDeRecaudacion.map(unidad => ({
@@ -44,7 +44,7 @@ const AbrirCorteScreen = () => {
     }));
   }, [unidadesDeRecaudacion]);
 
-  const onSelect = (option) => {
+  const onSelect = option => {
     const item = unidadesDeRecaudacion.find(unidad => unidad.id === option);
     setUnidadDeRecaudacion(item);
   };
@@ -69,7 +69,7 @@ const AbrirCorteScreen = () => {
     }
 
     setIsLoading(false);
-   };
+  };
 
   return (
     <>
@@ -77,41 +77,32 @@ const AbrirCorteScreen = () => {
         <Header title="Abrir Corte" />
 
         <KeyboardAwareScrollView
-          contentContainerStyle={{padding: 20}}
-        >
+          // eslint-disable-next-line react-native/no-inline-styles
+          contentContainerStyle={{padding: 20}}>
           <InputContainer>
-            <Label>
-              Unidad de recaudación
-            </Label>
+            <Label>Unidad de recaudación</Label>
 
             <InputInnerContainer>
               <TouchableWithoutFeedback
                 onPress={() => setShowPicker(true)}
-                disabled={isFetching || isLoading}
-              >
-                <PickerDisplayValue
-                  isPlaceholder={!unidadDeRecaudacion}
-                >
-                  {
-                    unidadDeRecaudacion
-                      // @ts-ignore
-                      ? unidadDeRecaudacion.descripcion
-                      : 'Seleccione una unidad de recaudación'
-                  }
+                disabled={isFetching || isLoading}>
+                <PickerDisplayValue isPlaceholder={!unidadDeRecaudacion}>
+                  {unidadDeRecaudacion
+                    ? // @ts-ignore
+                      unidadDeRecaudacion.descripcion
+                    : 'Seleccione una unidad de recaudación'}
                 </PickerDisplayValue>
               </TouchableWithoutFeedback>
             </InputInnerContainer>
           </InputContainer>
 
           <InputContainer>
-            <Label>
-              Total de fondo (Efectivo)
-            </Label>
+            <Label>Total de fondo (Efectivo)</Label>
 
             <InputInnerContainer>
               <Input
                 value={total}
-                onChangeText={(value) => setTotal(value)}
+                onChangeText={value => setTotal(value)}
                 placeholder="$0.00"
                 keyboardType="numeric"
                 placeholderTextColor="#aaaaaa"
@@ -124,15 +115,11 @@ const AbrirCorteScreen = () => {
             onPress={onSubmit}
             disabled={isFetching || isLoading}>
             <Button>
-              {
-                isLoading ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <ButtonText>
-                    Abrir corte
-                  </ButtonText>
-                )
-              }
+              {isLoading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <ButtonText>Abrir corte</ButtonText>
+              )}
             </Button>
           </TouchableWithoutFeedback>
         </KeyboardAwareScrollView>
@@ -157,7 +144,7 @@ const AbrirCorteScreen = () => {
 
 const Container = styled.View`
   flex: 1;
-  background-color: #EFF4F8;
+  background-color: #eff4f8;
 `;
 
 const InputContainer = styled.View`
@@ -174,7 +161,7 @@ const Label = styled.Text`
 const InputInnerContainer = styled.View`
   flex-direction: row;
   align-items: center;
-  border: 1px solid #DCDCDC;
+  border: 1px solid #dcdcdc;
 `;
 
 const Input = styled.TextInput`
@@ -183,15 +170,15 @@ const Input = styled.TextInput`
   color: #141414;
 `;
 
-const PickerDisplayValue = styled.Text<{ isPlaceholder?: boolean }>`
+const PickerDisplayValue = styled.Text<{isPlaceholder?: boolean}>`
   padding-vertical: 10px;
   padding-horizontal: 15px;
-  color: ${props => props.isPlaceholder ? '#aaaaaa' : '#141414'}
+  color: ${props => (props.isPlaceholder ? '#aaaaaa' : '#141414')};
 `;
 
 const Button = styled.View`
   padding: 15px;
-  background-color: #D2B15B;
+  background-color: #d2b15b;
   border-radius: 5px;
   align-items: center;
   justify-content: center;
@@ -200,7 +187,7 @@ const Button = styled.View`
 const ButtonText = styled.Text`
   font-family: ${fonts.bold};
   font-weight: bold;
-  color: #FFFFFF;
+  color: #ffffff;
   font-size: 16px;
 `;
 

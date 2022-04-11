@@ -1,10 +1,7 @@
 // External dependencies
-import {
-  StyleSheet,
-  View,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import React from 'react';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 
 // Internal dependencies
 import Header from '../components/Header';
