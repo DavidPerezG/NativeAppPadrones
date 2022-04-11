@@ -1,12 +1,12 @@
 // Internal dependencies
 import React from 'react';
-import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import {useDispatch} from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 // External dependencies
-import {dispatchClearAuth} from '../store/actions/auth';
+import { dispatchClearAuth } from '../store/actions/auth';
 
 const MenuCard = props => {
   // Props
@@ -25,7 +25,7 @@ const MenuCard = props => {
       navigation.reset({
         index: 0,
         // @ts-ignore
-        routes: [{name: props.navPage}],
+        routes: [{ name: props.navPage }],
       });
     } else {
       // @ts-ignore
@@ -34,12 +34,12 @@ const MenuCard = props => {
   };
 
   if (isBlank) {
-    return <View style={{...styles.squareStyleBlank, ...props.style}} />;
+    return <View style={{ ...styles.squareStyleBlank, ...props.style }} />;
   }
 
   return (
     <TouchableWithoutFeedback onPress={handleClick}>
-      <View style={{...styles.squareStyle, ...props.style}}>
+      <View style={{ ...styles.squareStyle, ...props.style }}>
         <FontAwesome5
           name={props.iconName}
           size={40}
@@ -47,7 +47,7 @@ const MenuCard = props => {
           solid
           color={props.col}
         />
-        <Text style={[styles.text, {color: props.col}]}>
+        <Text style={[styles.text, { color: props.col }]}>
           {props.nombreItem}
         </Text>
       </View>
@@ -58,17 +58,17 @@ const MenuCard = props => {
 const styles = StyleSheet.create({
   squareStyle: {
     borderRadius: 5,
-    width: 120,
+    width: 110,
     height: 120,
     backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'black',
-    shadowOffset: {width: 0, height: 3},
+    shadowOffset: { width: 0, height: 3 },
     shadowRadius: 7,
     shadowOpacity: 0.09,
     elevation: 5,
-    marginHorizontal: 0,
+    margin: 3,
   },
   squareStyleBlank: {
     borderRadius: 5,

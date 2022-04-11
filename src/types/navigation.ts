@@ -4,6 +4,10 @@ export type RootStackParamList = {
   login: undefined;
   caja: undefined;
   'abrir-corte': undefined;
-  profile: undefined;
-  'detalle-de-corte': undefined;
+  'busqueda-padron': undefined;
+};
+
+export type { RootStackParamList };
+profile: undefined;
+'detalle-de-corte': undefined;
 };
