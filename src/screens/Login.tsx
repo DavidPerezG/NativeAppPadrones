@@ -8,7 +8,6 @@ import {
   Image,
   TextInput,
   Pressable,
-  Modal,
   ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
@@ -16,8 +15,8 @@ import {useDispatch} from 'react-redux';
 
 // Internal dependencies
 import ModalMessage from '../components/ModalMessage';
-import { login } from '../services/auth';
-import { dispatchClearAuth, dispatchLogin } from '../store/actions/auth';
+import {login} from '../services/auth';
+import {dispatchClearAuth, dispatchLogin} from '../store/actions/auth';
 
 const Login = () => {
   // Component's state
@@ -36,6 +35,7 @@ const Login = () => {
   // Effects
   useEffect(() => {
     dispatchClearAuth(dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -61,10 +61,12 @@ const Login = () => {
 
       navigation.reset({
         index: 0,
-        routes: [{
-          // @ts-ignore
-          name: 'loading',
-        }],
+        routes: [
+          {
+            // @ts-ignore
+            name: 'loading',
+          },
+        ],
       });
       return;
     }
@@ -129,13 +131,11 @@ const Login = () => {
           style={styles.button}
           android_ripple={{color: 'green'}}
           disabled={loading}>
-            {
-              loading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.iniciarText}>Iniciar Sesión</Text>
-              )
-            }
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.iniciarText}>Iniciar Sesión</Text>
+          )}
         </Pressable>
       </View>
 

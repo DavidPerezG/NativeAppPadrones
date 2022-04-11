@@ -1,18 +1,14 @@
 // External dependencies
-import React, { useEffect } from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  View,
-} from 'react-native';
+import React, {useEffect} from 'react';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import { useDispatch, useSelector } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 
 // Internal dependencies
-import { getUserInfo } from '../services/user';
-import { refreshToken } from '../services/http';
-import { dispatchSetRefreshToken } from '../store/actions/auth';
-import { dispatchSetUserInfo } from '../store/actions/user';
+import {getUserInfo} from '../services/user';
+import {refreshToken} from '../services/http';
+import {dispatchSetRefreshToken} from '../store/actions/auth';
+import {dispatchSetUserInfo} from '../store/actions/user';
 
 const LoadingScreen = () => {
   // Navigation
@@ -29,6 +25,7 @@ const LoadingScreen = () => {
     setTimeout(() => {
       onLoad();
     }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
 
   // Handlers
@@ -48,10 +45,12 @@ const LoadingScreen = () => {
 
       navigation.reset({
         index: 0,
-        routes: [{
-          // @ts-ignore
-          name: 'login',
-        }]
+        routes: [
+          {
+            // @ts-ignore
+            name: 'login',
+          },
+        ],
       });
 
       return;
@@ -64,10 +63,12 @@ const LoadingScreen = () => {
 
       navigation.reset({
         index: 0,
-        routes: [{
-          // @ts-ignore
-          name: 'menu',
-        }]
+        routes: [
+          {
+            // @ts-ignore
+            name: 'menu',
+          },
+        ],
       });
 
       return;
@@ -75,19 +76,18 @@ const LoadingScreen = () => {
 
     navigation.reset({
       index: 0,
-      routes: [{
-        // @ts-ignore
-        name: 'login',
-      }]
+      routes: [
+        {
+          // @ts-ignore
+          name: 'login',
+        },
+      ],
     });
   };
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator
-        size="large"
-        color="#141414"
-      />
+      <ActivityIndicator size="large" color="#141414" />
     </View>
   );
 };

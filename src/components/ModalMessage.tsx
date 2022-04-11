@@ -1,20 +1,14 @@
 // External dependencies
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Modal,
-} from 'react-native';
+import {View, Text, StyleSheet, Pressable, Modal} from 'react-native';
 
 // Types & Interfaces
 interface ModalMessageProps {
   message: string;
   clearMessage: () => void;
-};
+}
 
-const ModalMessage = ({ message, clearMessage }: ModalMessageProps) => {
+const ModalMessage = ({message, clearMessage}: ModalMessageProps) => {
   // Component's state
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,17 +26,12 @@ const ModalMessage = ({ message, clearMessage }: ModalMessageProps) => {
   };
 
   return (
-    <Modal
-      visible={isOpen}
-      transparent
-      onRequestClose={onClose}>
+    <Modal visible={isOpen} transparent onRequestClose={onClose}>
       <View style={styles.centeredModal}>
         <View style={styles.modal}>
           <Text style={styles.message}>{message}</Text>
-          <Pressable
-            style={styles.modalButton}
-            onPress={onClose}>
-            <Text style={{color: 'black'}}>Entendido</Text>
+          <Pressable style={styles.modalButton} onPress={onClose}>
+            <Text style={styles.buttonText}>Entendido</Text>
           </Pressable>
         </View>
       </View>
@@ -55,11 +44,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#00000080',
+    backgroundColor: '#000000',
   },
   modal: {
     backgroundColor: 'white',
-
     width: 300,
     alignItems: 'center',
     borderRadius: 10,
@@ -77,6 +65,9 @@ const styles = StyleSheet.create({
     margin: 20,
     fontSize: 15,
     color: 'black',
+  },
+  buttonText: {
+    color: '#000000',
   },
 });
 

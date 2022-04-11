@@ -1,7 +1,7 @@
 // External dependencies
 import React from 'react';
-import { TouchableWithoutFeedback } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {TouchableWithoutFeedback} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
 
 // Internal dependencies
@@ -15,37 +15,22 @@ interface HeaderProps {
 
 export const HEADER_HEIGHT = 55;
 
-const Header: React.FC<HeaderProps> = ({
-  onClose,
-  disabled,
-  title,
-}) => {
+const Header: React.FC<HeaderProps> = ({onClose, disabled, title}) => {
   const insets = useSafeAreaInsets();
 
   return (
     <Container
       style={{
         paddingTop: insets.top,
-      }}
-    >
+      }}>
       <InnerContainer>
-        <TouchableWithoutFeedback
-          onPress={onClose}
-          disabled={disabled}
-        >
-          <IconContainer>
-
-          </IconContainer>
+        <TouchableWithoutFeedback onPress={onClose} disabled={disabled}>
+          <IconContainer />
         </TouchableWithoutFeedback>
 
         <TitleContainer>
-          <Title
-            numberOfLines={1}
-          >
-            {title}
-          </Title>
+          <Title numberOfLines={1}>{title}</Title>
         </TitleContainer>
-
       </InnerContainer>
     </Container>
   );

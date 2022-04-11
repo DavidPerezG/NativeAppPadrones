@@ -1,4 +1,4 @@
-type RootStackParamList = {
+export type RootStackParamList = {
   loading: undefined;
   menu: undefined;
   login: undefined;
@@ -6,5 +6,3 @@ type RootStackParamList = {
   'abrir-corte': undefined;
   profile: undefined;
 };
-
-export type {RootStackParamList};

@@ -1,19 +1,21 @@
 // Internal dependencies
-import React, {useState} from 'react';
+import React from 'react';
 import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useDispatch } from 'react-redux';
+import {useDispatch} from 'react-redux';
 
 // External dependencies
-import { dispatchClearAuth } from '../store/actions/auth';
+import {dispatchClearAuth} from '../store/actions/auth';
 
 const MenuCard = props => {
-  const [isBlank, blank] = useState(props.isBlank);
-  const [isIconType, setIsIconType] = useState(props.enableEntypo);
+  // Props
+  const isBlank = Boolean(props?.isBlank);
 
+  // Navigation
   const navigation = useNavigation();
 
+  // Redux
   const dispatch = useDispatch();
 
   const handleClick = () => {
@@ -22,21 +24,19 @@ const MenuCard = props => {
 
       navigation.reset({
         index: 0,
+        // @ts-ignore
         routes: [{name: props.navPage}],
       });
     } else {
-      props.navPage ? navigation.push(props.navPage) : false;
+      // @ts-ignore
+      props.navPage ? navigation.navigate(props.navPage) : false;
     }
   };
 
   if (isBlank) {
-    return (
-      <View
-        handleEvent={blank}
-        style={{...styles.squareStyleBlank, ...props.style}}
-      />
-    );
+    return <View style={{...styles.squareStyleBlank, ...props.style}} />;
   }
+
   return (
     <TouchableWithoutFeedback onPress={handleClick}>
       <View style={{...styles.squareStyle, ...props.style}}>
@@ -47,7 +47,9 @@ const MenuCard = props => {
           solid
           color={props.col}
         />
-        <Text style={[styles.text, { color: props.col }]}>{props.nombreItem}</Text>
+        <Text style={[styles.text, {color: props.col}]}>
+          {props.nombreItem}
+        </Text>
       </View>
     </TouchableWithoutFeedback>
   );

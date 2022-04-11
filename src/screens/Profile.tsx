@@ -1,10 +1,10 @@
 // External dependencies
 import React from 'react';
-import { useSelector } from 'react-redux';
+import {useSelector} from 'react-redux';
 import styled from 'styled-components/native';
 
 // Internal dependencies
-import { SCREEN_WIDTH } from '../utils/constants';
+import {SCREEN_WIDTH} from '../utils/constants';
 import fonts from '../utils/fonts';
 
 const ProfileScreen = () => {
@@ -15,94 +15,61 @@ const ProfileScreen = () => {
   return (
     <Container>
       <AvatarContainer>
-        <AvatarInnerContainer >
-          <Avatar
-            source={{ uri: user.foto }}
-          ></Avatar>
+        <AvatarInnerContainer>
+          <Avatar source={{uri: user.foto}} />
         </AvatarInnerContainer>
       </AvatarContainer>
 
       <FormContainer>
-
         <FormItem>
-          <Label>
-            Nombre(s)
-          </Label>
+          <Label>Nombre(s)</Label>
 
-          <Value>
-            { user?.first_name || 'Sin información' }
-          </Value>
+          <Value>{user?.first_name || 'Sin información'}</Value>
         </FormItem>
 
         <FormItem>
-          <Label>
-            Apellido Paterno
-          </Label>
+          <Label>Apellido Paterno</Label>
 
-          <Value>
-            { user?.last_name || 'Sin información' }
-          </Value>
+          <Value>{user?.last_name || 'Sin información'}</Value>
         </FormItem>
 
         <FormItem>
-          <Label>
-            Apellido Materno
-          </Label>
+          <Label>Apellido Materno</Label>
 
-          <Value>
-            { user?.second_last_name || 'Sin información' }
-          </Value>
+          <Value>{user?.second_last_name || 'Sin información'}</Value>
         </FormItem>
 
         <FormItem>
-          <Label>
-            Correo electrónico
-          </Label>
+          <Label>Correo electrónico</Label>
 
-          <Value>
-            { user?.email || 'Sin información' }
-          </Value>
+          <Value>{user?.email || 'Sin información'}</Value>
         </FormItem>
 
         <FormItem>
-          <Label>
-            Correo alternativo
-          </Label>
+          <Label>Correo alternativo</Label>
 
-          <Value>
-            { user?.email_alternativo || 'Sin información' }
-          </Value>
+          <Value>{user?.email_alternativo || 'Sin información'}</Value>
         </FormItem>
 
         <FormItem>
-          <Label>
-            Lada
-          </Label>
+          <Label>Lada</Label>
 
-          <Value>
-            { user?.lada || 'Sin información' }
-          </Value>
+          <Value>{user?.lada || 'Sin información'}</Value>
         </FormItem>
 
         <FormItem>
-          <Label>
-            Número de teléfono
-          </Label>
+          <Label>Número de teléfono</Label>
 
-          <Value>
-            { user?.numero_de_celular || 'Sin información' }
-          </Value>
+          <Value>{user?.numero_de_celular || 'Sin información'}</Value>
         </FormItem>
-
       </FormContainer>
-
     </Container>
   );
 };
 
 const Container = styled.View`
   flex: 1;
-  background-color: #EFF4F8;
+  background-color: #eff4f8;
 `;
 
 const AvatarContainer = styled.View`
@@ -117,7 +84,7 @@ const AvatarInnerContainer = styled.View`
   aspect-ratio: 1;
   width: 50%;
   background-color: #fff;
-  border: 1px solid #E5E5E5;
+  border: 1px solid #e5e5e5;
   overflow: hidden;
 `;
 

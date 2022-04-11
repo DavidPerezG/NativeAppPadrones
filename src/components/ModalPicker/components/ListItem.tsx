@@ -1,6 +1,6 @@
 // External dependencies
 import React from 'react';
-import { TouchableWithoutFeedback } from 'react-native';
+import {TouchableWithoutFeedback} from 'react-native';
 import styled from 'styled-components/native';
 
 // External dependencies
@@ -15,30 +15,16 @@ interface ListItemProps {
 
 export const LIST_ITEM_HEIGHT = 50;
 
-const ListItem: React.FC<ListItemProps> = ({
-  text,
-  onPress,
-  isSelected,
-}) => (
-  <TouchableWithoutFeedback
-    onPress={onPress}
-  >
+const ListItem: React.FC<ListItemProps> = ({text, onPress, isSelected}) => (
+  <TouchableWithoutFeedback onPress={onPress}>
     <Container>
-      <Text>
-        { text }
-      </Text>
+      <Text>{text}</Text>
 
-      {
-        isSelected && (
-          <IconContainer>
-            <Icon
-              name="ios-checkmark"
-              size={20}
-              color="#000000"
-            />
-          </IconContainer>
-        )
-      }
+      {isSelected && (
+        <IconContainer>
+          <Icon name="ios-checkmark" size={20} color="#000000" />
+        </IconContainer>
+      )}
     </Container>
   </TouchableWithoutFeedback>
 );
