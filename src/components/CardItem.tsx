@@ -1,18 +1,18 @@
-import React from 'react'
-import { TouchableWithoutFeedback } from 'react-native'
-import { useNavigation } from '@react-navigation/native';
+import React from 'react';
+import {TouchableWithoutFeedback} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import styled from 'styled-components/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import fonts from '../utils/fonts';
 
-const CardItem = ({ navegar }) => {
+const CardItem = ({navegar, info}) => {
   const navigation = useNavigation();
 
   return (
     <TouchableWithoutFeedback onPress={() => navigation.navigate(navegar)}>
       <Container>
-        <Label>estes es un card de busqueda</Label>
+        <Label>{info}</Label>
         <FontAwesome5
           name={'chevron-right'}
           size={19}
@@ -21,11 +21,11 @@ const CardItem = ({ navegar }) => {
         />
       </Container>
     </TouchableWithoutFeedback>
-  )
-}
+  );
+};
 
 const Container = styled.View`
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   flex-direction: row;
   height: 53px;
   width: 100%;
@@ -37,6 +37,7 @@ const Container = styled.View`
   shadow-opacity: 0.1;
   shadow-radius: 1px;
   elevation: 5;
+  margin-vertical: 5px;
 `;
 
 const Label = styled.Text`
@@ -46,4 +47,4 @@ const Label = styled.Text`
   font-size: 16px;
   flex: 1;
 `;
-export default CardItem
+export default CardItem;

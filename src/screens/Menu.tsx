@@ -24,7 +24,7 @@ const Menu = () => {
           nombreItem="Caja"
           iconName="cash-register"
           col="#3F3F3F"
-          navPage="caja"
+          navPage="cargosPadrones"
         />
 
         <MenuCard

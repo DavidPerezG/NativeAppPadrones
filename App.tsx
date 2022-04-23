@@ -1,13 +1,13 @@
 // External dependencies
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Provider } from 'react-redux';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {PersistGate} from 'redux-persist/integration/react';
+import {Provider} from 'react-redux';
 
 // Internal dependencies
-import { RootStackParamList } from './src/types/navigation';
-import { persistor, store } from './src/store/index';
+import {RootStackParamList} from './src/types/navigation';
+import {persistor, store} from './src/store/index';
 
 // Screens
 import Login from './src/screens/Login';

@@ -1,40 +1,46 @@
-import React from 'react'
-import { StyleSheet, View, TextInput } from 'react-native'
+import React from 'react';
+import {StyleSheet, View, TextInput} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+
+import {useDispatch, useSelector} from 'react-redux';
+import {dispatchAddPadron} from '../store/actions/caja';
 
 import fonts from '../utils/fonts';
 import Header from '../components/Header';
 import CardItem from '../components/CardItem';
 
-
 const BusquedaPadron = () => {
+  const dispatch = useDispatch();
+
+  const addHandler = padron => {
+    dispatchAddPadron(dispatch, padron);
+    // Navergar a siguiente pantalla
+  };
+
   return (
     <Container>
-      <Header title="Busqueda de Padron" />
+      <Header title="Cargos Padrones" isGoBack />
       <MenuContainer>
         <SearchInput>
-          <FontAwesome5
-            name={'search'}
-            size={19}
-            solid
-            color={'#C4C4C4'}
+          <FontAwesome5 name={'search'} size={19} solid color={'#C4C4C4'} />
+          <Input
+            placeholder="Buscar Padron..."
+            placeholderTextColor={'#C4C4C4'}
           />
-          <Input placeholder='Buscar Padrones...' placeholderTextColor={'#C4C4C4'} />
         </SearchInput>
 
         <Linepx />
 
-        <CardItem navegar={"cargosPadrones"} />
-
+        <CardItem navegar={'cargosPadrones'} />
       </MenuContainer>
     </Container>
-  )
-}
+  );
+};
 
 const Container = styled.View`
   flex: 1;
-  background-color: #EFF4F8;
+  background-color: #eff4f8;
 `;
 const MenuContainer = styled.View`
   flex: 1;
@@ -52,18 +58,17 @@ const SearchInput = styled.View`
 `;
 
 const Input = styled.TextInput`
- flex: 1;
- margin-horizontal: 5px;
- font-family: ${fonts.regular};
- color: #141414;
+  flex: 1;
+  margin-horizontal: 5px;
+  font-family: ${fonts.regular};
+  color: #141414;
 `;
 
 const Linepx = styled.View`
- height: 1.5px;
- width: 100%;
- background-color: #D5D5D5;
- margin-vertical: 15px;
+  height: 1.5px;
+  width: 100%;
+  background-color: #d5d5d5;
+  margin-vertical: 15px;
 `;
 
-export default BusquedaPadron
-
+export default BusquedaPadron;
