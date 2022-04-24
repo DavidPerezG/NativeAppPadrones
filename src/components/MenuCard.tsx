@@ -1,12 +1,12 @@
 // Internal dependencies
 import React from 'react';
-import { StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useDispatch } from 'react-redux';
+import {useDispatch} from 'react-redux';
 
 // External dependencies
-import { dispatchClearAuth } from '../store/actions/auth';
+import {dispatchClearAuth} from '../store/actions/auth';
 
 const MenuCard = props => {
   // Props
@@ -19,13 +19,19 @@ const MenuCard = props => {
   const dispatch = useDispatch();
 
   const handleClick = () => {
+    if (props.navPage === 'cargosPadrones') {
+      global.padronSeleccionado = props.nombreItem;
+      navigation.navigate('cargosPadrones', {padronNombre: props.nombreItem});
+      return null;
+    }
+
     if (props.navPage === 'login') {
       dispatchClearAuth(dispatch);
 
       navigation.reset({
         index: 0,
         // @ts-ignore
-        routes: [{ name: props.navPage }],
+        routes: [{name: props.navPage}],
       });
     } else {
       // @ts-ignore
@@ -34,12 +40,12 @@ const MenuCard = props => {
   };
 
   if (isBlank) {
-    return <View style={{ ...styles.squareStyleBlank, ...props.style }} />;
+    return <View style={{...styles.squareStyleBlank, ...props.style}} />;
   }
 
   return (
     <TouchableWithoutFeedback onPress={handleClick}>
-      <View style={{ ...styles.squareStyle, ...props.style }}>
+      <View style={{...styles.squareStyle, ...props.style}}>
         <FontAwesome5
           name={props.iconName}
           size={40}
@@ -47,7 +53,7 @@ const MenuCard = props => {
           solid
           color={props.col}
         />
-        <Text style={[styles.text, { color: props.col }]}>
+        <Text style={[styles.text, {color: props.col}]}>
           {props.nombreItem}
         </Text>
       </View>
@@ -64,7 +70,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'black',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
     shadowRadius: 7,
     shadowOpacity: 0.09,
     elevation: 5,

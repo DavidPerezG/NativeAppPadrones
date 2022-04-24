@@ -1,10 +1,21 @@
 import React, {useState, useEffect} from 'react';
-import {NativeModules, TouchableWithoutFeedback} from 'react-native';
+import {
+  ActivityIndicator,
+  Alert,
+  NativeModules,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
 
 import {getContribuyentes} from '../services/catalagos';
+import {
+  getAdeudoCiudadano,
+  getAdeudoEmpresa,
+  getAdeudoPredio,
+  getAdeudoVehiculo,
+} from '../services/padrones';
 import {useDispatch, useSelector} from 'react-redux';
 import {dispatchAddPadron} from '../store/actions/caja';
 
@@ -12,9 +23,16 @@ import fonts from '../utils/fonts';
 import Header from '../components/Header';
 import CardItem from '../components/CardItem';
 
-const CargosPadrones = () => {
+const CargosPadrones = ({route}) => {
   const [contribuyente, setContribuyente] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [nameSearch, setNameSearch] = useState('');
+  const [resultCargos, setResultCargos] = useState();
+  const [newData, setNewData] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [padronName, setPadronName] = useState();
+  const [importeTotal, setImporteTotal] = useState(0);
 
   const navigation = useNavigation();
 
@@ -26,9 +44,72 @@ const CargosPadrones = () => {
     setContribuyente(response);
   };
 
+  const showAlert = mensaje =>
+    Alert.alert('Problema en la busqueda', mensaje, [
+      {
+        text: 'Entendido',
+        style: 'cancel',
+      },
+    ]);
+
   useEffect(() => {
     fetchContribuyente();
+    console.log(route.params.nombrePadron);
   }, []);
+
+  const handleSearch = async formData => {
+    setIsLoading(true);
+    setNewData(false);
+    let nombrePadron = route.params.padronNombre;
+    let response;
+    if (nombrePadron === 'Ciudadano') {
+      response = await getAdeudoCiudadano(searchText, formData);
+      response !== null ? setNameSearch(response.first_name) : null;
+    } else if (nombrePadron === 'Empresa') {
+      response = await getAdeudoEmpresa(searchText, formData);
+      response !== null ? setNameSearch(response.nombre_comercial) : null;
+      // setNameSearch(response.nombre_comercial);
+    } else if (nombrePadron === 'Predio') {
+      response = await getAdeudoPredio(searchText, formData);
+      response !== null
+        ? setNameSearch(response.cuenta_unica_de_predial)
+        : null;
+      // setNameSearch(response?.cuenta_unica_de_predial);
+    } else if (nombrePadron === 'Vehiculo') {
+      response = await getAdeudoVehiculo(searchText, formData);
+      response !== null ? setNameSearch(response.numero_de_placa) : null;
+      // setNameSearch(response?.numero_de_placa);
+    }
+    if (response === null || response === undefined) {
+      setIsLoading(false);
+      if (
+        nombrePadron === 'Caja' ||
+        nombrePadron === null ||
+        nombrePadron === undefined
+      ) {
+        showAlert('Seleccione un padron primero');
+      } else {
+        showAlert('No se encontró nada que concuerde con la busqueda');
+      }
+    } else {
+      setResultCargos(response?.cargos);
+      setNewData(true);
+      let total = 0;
+      console.log('asdasdasdasdasdsadadasd');
+      console.log(response.cargos);
+      response?.cargos.map(cargo => {
+        console.log('imporrtttt');
+        console.log(cargo);
+        total = total + cargo.importe;
+      });
+      console.log('termn');
+      console.log(total);
+      setImporteTotal(total);
+    }
+    console.log('response se se');
+    console.log(response);
+    setIsLoading(false);
+  };
 
   const calcular = async () => {
     setLoading(true);
@@ -45,9 +126,15 @@ const CargosPadrones = () => {
           <FontAwesome5 name={'search'} size={19} solid color={'#C4C4C4'} />
           <Input
             placeholder="Buscar Contribuyente..."
-            placeholderTextColor={'#C4C4C4'}>
-            04 - Carlos Iturrios
-          </Input>
+            placeholderTextColor={'#C4C4C4'}
+            onChangeText={text => setSearchText(text)}
+          />
+          <TouchableWithoutFeedback
+            onPress={() => {
+              handleSearch();
+            }}>
+            <FontAwesome5 name={'search'} size={19} solid color={'#C4C4C4'} />
+          </TouchableWithoutFeedback>
         </SearchInput>
 
         <Linepx />
@@ -56,27 +143,40 @@ const CargosPadrones = () => {
           <AddButton>
             <FontAwesome5 name={'plus'} size={19} solid color={'#841F36'} />
 
-            <Label>Añadir Padron</Label>
+            <Label>
+              {route.params.padronNombre !== 'Caja' && route.params.padronNombre
+                ? route.params.padronNombre
+                : 'Seleccionar Padron'}
+            </Label>
           </AddButton>
         </TouchableWithoutFeedback>
 
         <Linepx />
         {/*flatlist con la lista de padrones linea 21*/}
-        <CardItem
-          info={'Ciudadano: Carlos Iturrios $0.00'}
-          navegar={'detallesPadron'}
-        />
+        {newData === true && resultCargos[0] !== null
+          ? resultCargos.map((cargo, index) => (
+              <CardItem
+                key={index}
+                info={
+                  '' +
+                  route.params.padronNombre +
+                  ': ' +
+                  nameSearch +
+                  ' $' +
+                  cargo.importe
+                }
+                navegar="detallesPadron"
+              />
+            ))
+          : null}
 
-        <CardItem
-          info={'Empresa: Acuacutores el... $0.00'}
-          navegar={'detallesPadron'}
-        />
+        {isLoading ? <ActivityIndicator size="large" color="#fc9696" /> : null}
       </MenuContainer>
 
       <Footer>
         <LabelContainer>
           <TotalLabel>Total</TotalLabel>
-          <ValueLabel>$0.00</ValueLabel>
+          <ValueLabel>${importeTotal}</ValueLabel>
         </LabelContainer>
 
         <TouchableWithoutFeedback onPress={calcular}>

@@ -28,19 +28,17 @@ const Caja = () => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {
-    if (global.token === '') {
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'login'}],
-      });
-    }
-  }, []);
+  useEffect(() => {}, []);
 
   const fetchPadron = async () => {
     const response = await getPadrones();
     console.log(response);
     setPadrones(response);
+  };
+
+  const goBack = () => {
+    console.log('esta');
+    navigation.state.params.onSelect({selected: true});
   };
 
   useEffect(() => {
@@ -58,7 +56,10 @@ const Caja = () => {
             nombreItem={item.model}
             iconName={iconsCard[item.model]}
             col="#3F3F3F"
-            navPage="busqueda-padron"
+            navPage="cargosPadrones"
+            handleClick={false}
+            navProps={navigation}
+            onPress={() => goBack(item.model)}
           />
         )}
         keyExtractor={item => item.id}
