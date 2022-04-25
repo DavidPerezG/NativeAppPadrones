@@ -113,7 +113,10 @@ const CargosPadrones = ({route}) => {
 
   const calcular = async () => {
     setLoading(true);
-    const paymentResponse = await NativeModules.RNNetPay.doTrans('200');
+    const paymentResponse = await NativeModules.RNNetPay.doTrans(
+      importeTotal.toFixed(2),
+    );
+    console.log(paymentResponse);
     setLoading(false);
   };
 

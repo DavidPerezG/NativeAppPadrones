@@ -7,8 +7,9 @@ import {navigateWithReset} from '../utils/navigation';
 
 // Configuration
 export const API_SCHEMA = 'https';
-export const API_HOST = 'apigrp.migob.mx/';
-export const API_PATH = '';
+// export const API_HOST = 'apigrp.migob.mx/';
+export const API_HOST = 'apiingresosnayarit.migob.mx';
+export const API_PATH = '/';
 
 export const httpConfig = {
   baseURL: `${API_SCHEMA}://${API_HOST}${API_PATH}`,
@@ -23,6 +24,7 @@ export const HTTP = axios.create(httpConfig);
 // Interceptors
 const onSendRequest = config => {
   const token = store.getState()?.auth?.access;
+  console.log(token);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
