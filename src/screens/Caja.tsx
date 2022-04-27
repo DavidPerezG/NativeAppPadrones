@@ -28,8 +28,6 @@ const Caja = () => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {}, []);
-
   const fetchPadron = async () => {
     const response = await getPadrones();
     console.log(response);

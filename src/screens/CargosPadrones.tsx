@@ -37,6 +37,7 @@ const CargosPadrones = ({route}) => {
   const navigation = useNavigation();
 
   const padrones = useSelector(state => state.caja.padrones);
+  const hasCorte = useSelector(state => Boolean(state.user.corte));
 
   const fetchContribuyente = async () => {
     const response = await getContribuyentes();
@@ -44,17 +45,24 @@ const CargosPadrones = ({route}) => {
     setContribuyente(response);
   };
 
-  const showAlert = mensaje =>
-    Alert.alert('Problema en la busqueda', mensaje, [
+  const showAlert = (mensaje, titulo) =>
+    Alert.alert(`${titulo || 'Problema en la busqueda'}`, mensaje, [
       {
         text: 'Entendido',
         style: 'cancel',
       },
     ]);
 
+  const checkCorte = () => {
+    if (hasCorte) {
+      showAlert('Ya se encuentra un corte abierto', 'Alerta');
+      navigation.navigate('menu');
+    }
+  };
+
   useEffect(() => {
     fetchContribuyente();
-    console.log(route.params.nombrePadron);
+    checkCorte();
   }, []);
 
   const handleSearch = async formData => {
@@ -95,28 +103,30 @@ const CargosPadrones = ({route}) => {
       setResultCargos(response?.cargos);
       setNewData(true);
       let total = 0;
-      console.log('asdasdasdasdasdsadadasd');
-      console.log(response.cargos);
       response?.cargos.map(cargo => {
-        console.log('imporrtttt');
-        console.log(cargo);
         total = total + cargo.importe;
       });
-      console.log('termn');
-      console.log(total);
       setImporteTotal(total);
     }
-    console.log('response se se');
-    console.log(response);
     setIsLoading(false);
   };
 
   const calcular = async () => {
     setLoading(true);
-    const paymentResponse = await NativeModules.RNNetPay.doTrans(
-      importeTotal.toFixed(2),
-    );
-    console.log(paymentResponse);
+    if (importeTotal !== 0) {
+      await NativeModules.RNNetPay.doTrans(importeTotal.toFixed(2)).then(
+        response => {
+          let paymentResponse = response;
+          console.log(paymentResponse);
+        },
+        error => {
+          console.error(error);
+        },
+      );
+    } else {
+      showAlert('Cantidad Invalida', 'Problema en la transacción');
+    }
+
     setLoading(false);
   };
 
@@ -126,7 +136,6 @@ const CargosPadrones = ({route}) => {
 
       <MenuContainer>
         <SearchInput>
-          <FontAwesome5 name={'search'} size={19} solid color={'#C4C4C4'} />
           <Input
             placeholder="Buscar Contribuyente..."
             placeholderTextColor={'#C4C4C4'}
