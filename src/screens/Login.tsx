@@ -55,7 +55,6 @@ const Login = () => {
     }
 
     const loginResponse = await login(emailSanitized, password);
-    console.log('este es el log ' + loginResponse);
 
     if (
       loginResponse &&

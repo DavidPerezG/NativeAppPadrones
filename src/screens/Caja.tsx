@@ -30,12 +30,10 @@ const Caja = () => {
 
   const fetchPadron = async () => {
     const response = await getPadrones();
-    console.log(response);
     setPadrones(response);
   };
 
   const goBack = () => {
-    console.log('esta');
     navigation.state.params.onSelect({selected: true});
   };
 

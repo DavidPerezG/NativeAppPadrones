@@ -9,40 +9,84 @@ import styled from 'styled-components/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
 
+import BusquedaAvanzadaCiudadano from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaCiudadano';
+import BusquedaAvanzadaPredio from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaPredio';
+import BusquedaAvanzadaVehiculo from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaVehiculo';
+import BusquedaAvanzadaEmpresa from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaEmpresa';
+
 import {getContribuyentes} from '../services/catalagos';
 import {
   getAdeudoCiudadano,
-  getAdeudoEmpresa,
-  getAdeudoPredio,
-  getAdeudoVehiculo,
+  getAdeudoPadron,
+  getCiudadano,
+  getEmpresa,
+  getPredio,
+  getVehiculo,
 } from '../services/padrones';
-import {useDispatch, useSelector} from 'react-redux';
-import {dispatchAddPadron} from '../store/actions/caja';
+import {useSelector} from 'react-redux';
 
 import fonts from '../utils/fonts';
 import Header from '../components/Header';
 import CardItem from '../components/CardItem';
 
+const iconsCard = {
+  Ciudadano: {numero: 1, variableDeNombre: 'nombre_completo'},
+  Empresa: {numero: 2, variableDeNombre: 'razon_social'},
+  Predio: {numero: 3, variableDeNombre: 'descripcion'},
+  Vehiculo: {numero: 4, variableDeNombre: 'id'},
+};
+
 const CargosPadrones = ({route}) => {
-  const [contribuyente, setContribuyente] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [nameSearch, setNameSearch] = useState('');
   const [resultCargos, setResultCargos] = useState();
   const [newData, setNewData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [padronName, setPadronName] = useState();
   const [importeTotal, setImporteTotal] = useState(0);
+  const [nombrePadron, setNombrePadron] = useState();
+  const [numeroPadron, setNumeroPadron] = useState();
 
   const navigation = useNavigation();
-
-  const padrones = useSelector(state => state.caja.padrones);
   const hasCorte = useSelector(state => Boolean(state.user.corte));
 
-  const fetchContribuyente = async () => {
-    const response = await getContribuyentes();
-    console.log(response);
-    setContribuyente(response);
+  const handleFirstConfig = async () => {
+    let response = await getAdeudoPadron(route.params.data, numeroPadron);
+
+    let total = 0;
+    if (response.cargos[0] !== undefined) {
+      response?.cargos?.map(cargo => {
+        total = total + cargo?.importe;
+      });
+      setResultCargos(response?.cargos);
+    } else {
+      setResultCargos(undefined);
+    }
+    setNameSearch(route.params.data[iconsCard[nombrePadron]?.variableDeNombre]);
+    setImporteTotal(total);
+    setNewData(true);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (route.params.data) {
+      handleFirstConfig();
+    }
+  }, [route.params.data]);
+
+  useEffect(() => {
+    checkCorte();
+  }, []);
+
+  useEffect(() => {
+    setNombrePadron(route.params.padronNombre);
+    setNumeroPadron(iconsCard[route.params.padronNombre]?.numero);
+  }, [route.params.padronNombre]);
+
+  const checkCorte = () => {
+    if (hasCorte) {
+      showAlert('Ya se encuentra un corte abierto', 'Alerta');
+      navigation.navigate('menu');
+    }
   };
 
   const showAlert = (mensaje, titulo) =>
@@ -53,81 +97,91 @@ const CargosPadrones = ({route}) => {
       },
     ]);
 
-  const checkCorte = () => {
-    if (hasCorte) {
-      showAlert('Ya se encuentra un corte abierto', 'Alerta');
-      navigation.navigate('menu');
+  //Hace el get correspondiente al padron para obtener su informacion dependiendo de la busqueda
+  const handleGetOneData = async (searchData, formData) => {
+    let response;
+    let numeroDePadron;
+    if (nombrePadron === 'Ciudadano') {
+      response = await getCiudadano(searchData, formData);
+      numeroDePadron = 1;
+    } else if (nombrePadron === 'Empresa') {
+      response = await getEmpresa(searchData, formData);
+      numeroDePadron = 2;
+    } else if (nombrePadron === 'Predio') {
+      response = await getPredio(searchData, formData);
+      numeroDePadron = 3;
+    } else if (nombrePadron === 'Vehiculo') {
+      response = await getVehiculo(searchData, formData);
+      numeroDePadron = 4;
+    }
+
+    console.log('respuesta antes de adeudo [0]');
+
+    if (
+      response === null ||
+      response === undefined ||
+      response[0] === undefined
+    ) {
+      showAlert('No se encontró nada que concuerde con la busqueda');
+    } else if (response.length > 1) {
+      //Hay mas de un dato para poner en caja, hay que elegir cual poner
+      navigation.navigate('tabla-seleccion', {
+        nombrePadron: nombrePadron,
+        data: response,
+      });
+    } else {
+      //Solo hay un dato para poner en caja, procede
+
+      let result = await getAdeudoPadron(response[0], numeroDePadron);
+      let total = 0;
+      result?.cargos?.map(cargo => {
+        total = total + cargo?.importe;
+      });
+      setResultCargos(result?.cargos);
+      setNewData(true);
+      setNameSearch(
+        response[0][iconsCard[route.params.padronNombre]?.variableDeNombre],
+      );
+      setImporteTotal(total);
     }
   };
 
-  useEffect(() => {
-    fetchContribuyente();
-    checkCorte();
-  }, []);
-
+  //Maneja la funcion del boton de busqueda
   const handleSearch = async formData => {
     setIsLoading(true);
     setNewData(false);
-    let nombrePadron = route.params.padronNombre;
-    let response;
-    if (nombrePadron === 'Ciudadano') {
-      response = await getAdeudoCiudadano(searchText, formData);
-      response !== null ? setNameSearch(response.first_name) : null;
-    } else if (nombrePadron === 'Empresa') {
-      response = await getAdeudoEmpresa(searchText, formData);
-      response !== null ? setNameSearch(response.nombre_comercial) : null;
-      // setNameSearch(response.nombre_comercial);
-    } else if (nombrePadron === 'Predio') {
-      response = await getAdeudoPredio(searchText, formData);
-      response !== null
-        ? setNameSearch(response.cuenta_unica_de_predial)
-        : null;
-      // setNameSearch(response?.cuenta_unica_de_predial);
-    } else if (nombrePadron === 'Vehiculo') {
-      response = await getAdeudoVehiculo(searchText, formData);
-      response !== null ? setNameSearch(response.numero_de_placa) : null;
-      // setNameSearch(response?.numero_de_placa);
-    }
-    if (response === null || response === undefined) {
-      setIsLoading(false);
-      if (
-        nombrePadron === 'Caja' ||
-        nombrePadron === null ||
-        nombrePadron === undefined
-      ) {
-        showAlert('Seleccione un padron primero');
-      } else {
-        showAlert('No se encontró nada que concuerde con la busqueda');
-      }
+    if ((searchText === null || searchText === '') && formData === undefined) {
+      showAlert('Escriba algo en la busqueda');
+    } else if (
+      nombrePadron === 'Caja' ||
+      nombrePadron === null ||
+      nombrePadron === undefined
+    ) {
+      showAlert('Seleccione un padron primero');
     } else {
-      setResultCargos(response?.cargos);
-      setNewData(true);
-      let total = 0;
-      response?.cargos.map(cargo => {
-        total = total + cargo.importe;
-      });
-      setImporteTotal(total);
+      if (formData !== null && formData !== undefined) {
+        await handleGetOneData('', formData);
+      } else {
+        await handleGetOneData(searchText, formData);
+      }
     }
     setIsLoading(false);
   };
 
+  //Guarda el nombre en variable de estado de el dato correspondiente a su padrón
+
   const calcular = async () => {
-    setLoading(true);
+    setIsLoading(true);
     if (importeTotal !== 0) {
-      await NativeModules.RNNetPay.doTrans(importeTotal.toFixed(2)).then(
-        response => {
-          let paymentResponse = response;
-          console.log(paymentResponse);
-        },
-        error => {
-          console.error(error);
-        },
+      let paymentResponse = await NativeModules.RNNetPay.doTrans(
+        importeTotal.toFixed(2),
       );
+      console.log(paymentResponse.success);
     } else {
       showAlert('Cantidad Invalida', 'Problema en la transacción');
     }
 
-    setLoading(false);
+    setIsLoading(false);
   };
 
   return (
@@ -145,8 +199,22 @@ const CargosPadrones = ({route}) => {
             onPress={() => {
               handleSearch();
             }}>
-            <FontAwesome5 name={'search'} size={19} solid color={'#C4C4C4'} />
+            <SearchButton>
+              <FontAwesome5 name={'search'} size={30} solid color={'white'} />
+            </SearchButton>
           </TouchableWithoutFeedback>
+          {route.params.padronNombre === 'Ciudadano' ? (
+            <BusquedaAvanzadaCiudadano onSearch={handleSearch} />
+          ) : null}
+          {route.params.padronNombre === 'Empresa' ? (
+            <BusquedaAvanzadaEmpresa onSearch={handleSearch} />
+          ) : null}
+          {route.params.padronNombre === 'Predio' ? (
+            <BusquedaAvanzadaPredio onSearch={handleSearch} />
+          ) : null}
+          {route.params.padronNombre === 'Vehiculo' ? (
+            <BusquedaAvanzadaVehiculo onSearch={handleSearch} />
+          ) : null}
         </SearchInput>
 
         <Linepx />
@@ -164,9 +232,8 @@ const CargosPadrones = ({route}) => {
         </TouchableWithoutFeedback>
 
         <Linepx />
-        {/*flatlist con la lista de padrones linea 21*/}
-        {newData === true && resultCargos[0] !== null
-          ? resultCargos.map((cargo, index) => (
+        {newData === true
+          ? resultCargos?.map((cargo, index) => (
               <CardItem
                 key={index}
                 info={
@@ -175,16 +242,21 @@ const CargosPadrones = ({route}) => {
                   ': ' +
                   nameSearch +
                   ' $' +
-                  cargo.importe
+                  cargo?.importe
                 }
                 navegar="detallesPadron"
               />
             ))
           : null}
+        {newData === true &&
+        (resultCargos === undefined || resultCargos === []) ? (
+          <CardItem info={nameSearch + ' $ 0.00'} navegar="detallesPadron" />
+        ) : (
+          console.log(resultCargos)
+        )}
 
         {isLoading ? <ActivityIndicator size="large" color="#fc9696" /> : null}
       </MenuContainer>
-
       <Footer>
         <LabelContainer>
           <TotalLabel>Total</TotalLabel>
@@ -292,11 +364,26 @@ const LabelContainer = styled.View`
 const SearchInput = styled.View`
   flex-direction: row;
   background-color: white;
-  padding-horizontal: 10px;
-  padding-vertical: 4px;
+
   width: 100%;
   align-items: center;
   border-radius: 10px;
+`;
+
+const SearchButton = styled.View`
+  background-color: gray;
+  height: 46px;
+  padding: 5px;
+  padding-horizontal: 8px;
+`;
+
+const AdvanceSearchButton = styled.View`
+  background-color: #841f36;
+  height: 46px;
+  padding: 5px;
+  padding-horizontal: 8px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
 `;
 
 const Input = styled.TextInput`

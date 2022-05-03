@@ -1,28 +1,41 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  Touchable,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import styled from 'styled-components/native';
+import {useNavigation} from '@react-navigation/native';
 
 import fonts from '../utils/fonts';
 import Header from '../components/Header';
 
-const DetallasPadron = () => {
+const DetallasPadron = ({route}) => {
+  const navigation = useNavigation();
   return (
     <Container>
       <Header title="Detalles de Padron" />
       <MenuContainer>
-        <TitleLabel>
-          Titulo De Padron
-        </TitleLabel>
+        <TitleLabel>Titulo De Padron</TitleLabel>
         <Linepx />
+        {route.params.selectType ? (
+          <TouchableWithoutFeedback
+            onPress={() => {
+              navigation.navigate('cargosPadrones', {data: route.params.data});
+            }}>
+            <TitleLabel>Seleccionar</TitleLabel>
+          </TouchableWithoutFeedback>
+        ) : null}
       </MenuContainer>
     </Container>
-  )
-}
-
+  );
+};
 
 const Container = styled.View`
   flex: 1;
-  background-color: #EFF4F8;
+  background-color: #eff4f8;
 `;
 const MenuContainer = styled.View`
   flex: 1;
@@ -38,10 +51,21 @@ const TitleLabel = styled.Text`
 `;
 
 const Linepx = styled.View`
- height: 1.5px;
- width: 100%;
- background-color: #D5D5D5;
- margin-vertical: 15px;
+  height: 1.5px;
+  width: 100%;
+  background-color: #d5d5d5;
+  margin-vertical: 15px;
 `;
 
-export default DetallasPadron
+const SelectButton = styled.View`
+  height: 55px;
+  background-color: white;
+  border-radius: 25px;
+  padding-horizontal: 20px;
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+`;
+
+export default DetallasPadron;
