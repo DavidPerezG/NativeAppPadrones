@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   NativeModules,
+  ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native';
 import styled from 'styled-components/native';
@@ -28,6 +29,7 @@ import {useSelector} from 'react-redux';
 import fonts from '../utils/fonts';
 import Header from '../components/Header';
 import CardItem from '../components/CardItem';
+import Button from '../components/DefaultButton';
 
 const iconsCard = {
   Ciudadano: {numero: 1, variableDeNombre: 'nombre_completo'},
@@ -39,23 +41,26 @@ const iconsCard = {
 const CargosPadrones = ({route}) => {
   const [searchText, setSearchText] = useState('');
   const [nameSearch, setNameSearch] = useState('');
+  const [padronId, setPadronId] = useState();
   const [resultCargos, setResultCargos] = useState();
   const [newData, setNewData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [importeTotal, setImporteTotal] = useState(0);
   const [nombrePadron, setNombrePadron] = useState();
   const [numeroPadron, setNumeroPadron] = useState();
+  const [base64, setBase64] = useState();
 
   const navigation = useNavigation();
   const hasCorte = useSelector(state => Boolean(state.user.corte));
 
   const handleFirstConfig = async () => {
     let response = await getAdeudoPadron(route.params.data, numeroPadron);
-
+    setPadronId(response?.id);
     let total = 0;
     if (response.cargos[0] !== undefined) {
       response?.cargos?.map(cargo => {
-        total = total + cargo?.importe;
+        let cargoData = reduceArrCargos(cargo);
+        total += cargoData.adeudo_total;
       });
       setResultCargos(response?.cargos);
     } else {
@@ -81,6 +86,155 @@ const CargosPadrones = ({route}) => {
     setNombrePadron(route.params.padronNombre);
     setNumeroPadron(iconsCard[route.params.padronNombre]?.numero);
   }, [route.params.padronNombre]);
+
+  const reduceArrCargos = cargo => {
+    const {
+      descuentos_especiales,
+      actualizaciones,
+      recargos,
+      descuentos_aplicables,
+      gastos,
+      importe,
+    } = cargo;
+    let adeudo_total;
+    let descuentos_de_actualizacion = 0;
+    let descuentos_de_recargos = 0;
+    let descuentos_gastos_totales = 0;
+    let multa_recargos = 0;
+    let multa_gastos = 0;
+    let descuentos_de_recargos_str = '';
+    let descuentos_de_actualizaciones_str = '';
+    let descuentos_de_gastos_str = '';
+    const recargo_total = recargos.reduce(
+      (accum, curr) => accum + curr.importe_total,
+      0,
+    );
+
+    recargos.forEach(item => {
+      const {descuentos} = item;
+      let ttlDesc;
+      let ttlMultaRec;
+      if (descuentos.length) {
+        ttlDesc = descuentos.reduce(
+          (accum, curr) => accum + curr.importe_total,
+          0,
+        );
+        descuentos.forEach(i => {
+          descuentos_de_recargos_str += `\n\r-${i.comentarios} `;
+        });
+      } else {
+        ttlDesc = 0;
+      }
+      if (item?.es_multa) {
+        const filteredRecargos = recargos.filter(
+          recargo => recargo.es_multa === true,
+        );
+        ttlMultaRec = filteredRecargos.reduce(
+          (accum, curr) => accum + curr.importe_total,
+          0,
+        );
+      } else {
+        ttlMultaRec = 0;
+      }
+      multa_recargos += ttlMultaRec;
+      descuentos_de_recargos += ttlDesc;
+    });
+    gastos.forEach(item => {
+      const {descuentos} = item;
+      let ttlDesc;
+      let ttlMultaGto;
+      if (descuentos.length) {
+        ttlDesc = descuentos.reduce(
+          (accum, curr) => accum + curr.importe_total,
+          0,
+        );
+        descuentos.forEach(i => {
+          descuentos_de_gastos_str += `\n\r-${i.comentarios} `;
+        });
+      } else {
+        ttlDesc = 0;
+      }
+      if (item.es_multa) {
+        const filteredMultas = gastos.filter(gasto => gasto.es_multa === true);
+        ttlMultaGto = filteredMultas.reduce(
+          (accum, curr) => accum + curr.importe,
+          0,
+        );
+      } else {
+        ttlMultaGto = 0;
+      }
+      descuentos_gastos_totales += ttlDesc;
+      multa_gastos += ttlMultaGto;
+    });
+
+    actualizaciones.forEach(item => {
+      const {descuentos} = item;
+      let ttlDesc;
+      if (descuentos.length) {
+        ttlDesc = descuentos.reduce(
+          (accum, curr) => accum + curr.importe_total,
+          0,
+        );
+        descuentos.forEach(i => {
+          descuentos_de_actualizaciones_str += `\n\r-${i.comentarios} `;
+        });
+      } else {
+        ttlDesc = 0;
+      }
+      descuentos_de_actualizacion += ttlDesc;
+    });
+
+    const descuentos_especiales_totales = descuentos_especiales.reduce(
+      (accum, curr) => accum + curr.importe_total,
+      0,
+    );
+
+    const descuentos_aplicables_total = descuentos_aplicables.reduce(
+      (accum, curr) => accum + curr.importe_total,
+      0,
+    );
+
+    const actualizaciones_totales = actualizaciones.reduce(
+      (accum, curr) => accum + curr.importe_total,
+      0,
+    );
+
+    const gastos_totales = gastos.reduce(
+      (accum, curr) => accum + curr.importe,
+      0,
+    );
+
+    const descuentos_totales =
+      descuentos_aplicables_total + descuentos_especiales_totales;
+    const multas_totales = multa_gastos + multa_recargos;
+    adeudo_total =
+      importe -
+      descuentos_totales +
+      (recargo_total - descuentos_de_recargos) +
+      (actualizaciones_totales - descuentos_de_actualizacion) +
+      (gastos_totales - descuentos_gastos_totales) +
+      multas_totales;
+    adeudo_total = adeudo_total;
+
+    return {
+      descuentos_de_actualizaciones_str,
+      descuentos_de_recargos_str,
+      descuentos_de_gastos_str,
+      descuentos_gastos_totales,
+      descuentos_de_recargos,
+      descuentos_de_actualizacion,
+      descuentos_aplicables_total,
+      descuentos_especiales_totales,
+      descuentos_totales,
+      multas_totales,
+      multa_recargos,
+      multa_gastos,
+      actualizaciones_totales,
+      recargo_total: recargo_total - multa_recargos,
+      adeudo_total,
+      gastos_totales: gastos_totales - multa_gastos,
+    };
+  };
 
   const checkCorte = () => {
     if (hasCorte) {
@@ -131,11 +285,12 @@ const CargosPadrones = ({route}) => {
       });
     } else {
       //Solo hay un dato para poner en caja, procede
-
+      setPadronId(response[0].id);
       let result = await getAdeudoPadron(response[0], numeroDePadron);
       let total = 0;
       result?.cargos?.map(cargo => {
-        total = total + cargo?.importe;
+        let cargoData = reduceArrCargos(cargo);
+        total += cargoData.adeudo_total;
       });
       setResultCargos(result?.cargos);
       setNewData(true);
@@ -143,6 +298,8 @@ const CargosPadrones = ({route}) => {
         response[0][iconsCard[route.params.padronNombre]?.variableDeNombre],
       );
       setImporteTotal(total);
+      console.log('cargos de busqueda');
+      console.log(resultCargos);
     }
   };
 
@@ -232,42 +389,73 @@ const CargosPadrones = ({route}) => {
         </TouchableWithoutFeedback>
 
         <Linepx />
-        {newData === true
-          ? resultCargos?.map((cargo, index) => (
-              <CardItem
-                key={index}
-                info={
-                  '' +
-                  route.params.padronNombre +
-                  ': ' +
-                  nameSearch +
-                  ' $' +
-                  cargo?.importe
-                }
-                navegar="detallesPadron"
-              />
-            ))
-          : null}
-        {newData === true &&
-        (resultCargos === undefined || resultCargos === []) ? (
-          <CardItem info={nameSearch + ' $ 0.00'} navegar="detallesPadron" />
-        ) : (
-          console.log(resultCargos)
-        )}
+        <ScrollView>
+          {newData === true
+            ? resultCargos?.map((cargo, index) => {
+                var dataCargo = reduceArrCargos(cargo);
+                return (
+                  <CardItem
+                    key={index}
+                    info={
+                      '' +
+                      route.params.padronNombre +
+                      ': ' +
+                      nameSearch +
+                      ' $' +
+                      dataCargo?.adeudo_total
+                    }
+                    cargo={cargo}
+                    navegar="detallesPadron"
+                  />
+                );
+              })
+            : null}
+          {newData === true &&
+          (resultCargos?.[0] === undefined ||
+            resultCargos === [] ||
+            resultCargos === null) ? (
+            <CardItem info={nameSearch + ' $ 0.00'} navegar="detallesPadron" />
+          ) : (
+            console.log(resultCargos?.[0])
+          )}
 
-        {isLoading ? <ActivityIndicator size="large" color="#fc9696" /> : null}
+          {isLoading ? (
+            <ActivityIndicator size="large" color="#fc9696" />
+          ) : null}
+        </ScrollView>
       </MenuContainer>
       <Footer>
         <LabelContainer>
           <TotalLabel>Total</TotalLabel>
           <ValueLabel>${importeTotal}</ValueLabel>
         </LabelContainer>
+        {padronId ? (
+          <Button
+            text="Imprimir Opinión de Obligaciones"
+            style={{height: 40, marginBottom: 7}}
+            onPress={() =>
+              navigation.navigate('preview-pdf', {
+                padron_id: padronId,
+                tipo_de_padron: numeroPadron,
+              })
+            }
+          />
+        ) : null}
 
-        <TouchableWithoutFeedback onPress={calcular}>
-          <PaymentButton>
-            <LabelButton>Pagar Total</LabelButton>
-          </PaymentButton>
-        </TouchableWithoutFeedback>
+        <Button text="Imprimir Situación" style={{height: 40}} />
+        <Row>
+          <TouchableWithoutFeedback onPress={calcular}>
+            <PaymentButton>
+              <LabelButton>Pagar Total</LabelButton>
+            </PaymentButton>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback
+            onPress={() => navigation.navigate('recibos-de-caja')}>
+            <ReceiptButton>
+              <LabelButton>Recibo</LabelButton>
+            </ReceiptButton>
+          </TouchableWithoutFeedback>
+        </Row>
       </Footer>
     </Container>
   );
@@ -303,10 +491,29 @@ const AddButton = styled.View`
   align-items: center;
   justify-content: center;
 `;
-const PaymentButton = styled.View`
+
+const Row = styled.View`
+  flex-direction: row;
   width: 100%;
+  justify-content: space-between;
+`;
+
+const PaymentButton = styled.View`
+  width: 73%;
   height: 50px;
   background-color: #235161;
+  border-radius: 10px;
+  padding: 5px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-vertical: 10px;
+`;
+
+const ReceiptButton = styled.View`
+  width: 25%;
+  height: 50px;
+  background-color: #841f36;
   border-radius: 10px;
   padding: 5px;
   flex-direction: row;
@@ -349,7 +556,6 @@ const LabelButton = styled.Text`
 `;
 
 const Footer = styled.View`
-  height: 140px;
   width: 100%;
   background-color: #ffffff;
   padding-horizontal: 20px;

@@ -22,6 +22,9 @@ import ProfileScreen from './src/screens/Profile';
 import DetalleDeCorteScreen from './src/screens/DetalleDeCorte';
 import BusquedaAvanzadaCiudadano from './src/components/BusquedaAvanzadaComponents/BusquedaAvanzadaCiudadano';
 import TablaSeleccion from './src/screens/TablaSeleccion';
+import DetallesSeleccion from './src/screens/DetallesSeleccion';
+import RecibosDeCaja from './src/screens/RecibosDeCaja';
+import PreviewPDF from './src/screens/PreviewPDF';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -46,6 +49,9 @@ const AppContainer = () => (
         name="busqueda-avanzada-ciudadano"
         component={BusquedaAvanzadaCiudadano}
       />
+      <Stack.Screen name="detalles-seleccion" component={DetallesSeleccion} />
+      <Stack.Screen name="recibos-de-caja" component={RecibosDeCaja} />
+      <Stack.Screen name="preview-pdf" component={PreviewPDF} />
     </Stack.Navigator>
   </NavigationContainer>
 );

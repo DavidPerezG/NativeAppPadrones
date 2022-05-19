@@ -6,7 +6,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import fonts from '../utils/fonts';
 
-const CardItem = ({navegar, info, selectType, data, nombrePadron}) => {
+const CardItem = ({navegar, info, selectType, data, padron, cargo}) => {
   const navigation = useNavigation();
 
   return (
@@ -15,7 +15,8 @@ const CardItem = ({navegar, info, selectType, data, nombrePadron}) => {
         navigation.navigate(navegar, {
           selectType: selectType,
           data: data,
-          nombrePadron: nombrePadron,
+          nombrePadron: padron,
+          cargo: cargo,
         })
       }>
       <Container>

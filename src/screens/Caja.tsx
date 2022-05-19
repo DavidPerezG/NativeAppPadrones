@@ -69,6 +69,7 @@ const Caja = () => {
 const Container = styled.View`
   flex: 1;
   background-color: #eff4f8;
+  align-items: center;
 `;
 
 export default Caja;

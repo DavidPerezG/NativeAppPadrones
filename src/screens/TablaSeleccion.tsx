@@ -35,7 +35,7 @@ const TablaSeleccion = ({route}) => {
           renderItem={({item, index}) => (
             <CardItem
               info={item[nameVarPadron[nombrePadron]]}
-              navegar="detallesPadron"
+              navegar="detalles-seleccion"
               selectType
               padron={nombrePadron}
               data={item}

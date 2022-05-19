@@ -10,9 +10,10 @@ export type RootStackParamList = {
   'busqueda-avanzada-predio': undefined;
   'busqueda-avanzada-vehiculo': undefined;
   'tabla-seleccion': undefined;
+  'detalles-seleccion': undefined;
+  'recibos-de-caja': undefined;
+  'preview-pdf': undefined;
 };
 
-export type { RootStackParamList };
+export type {RootStackParamList};
 profile: undefined;
-'detalle-de-corte': undefined;
-};

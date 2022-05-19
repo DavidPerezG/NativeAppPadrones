@@ -6,14 +6,11 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import propTypes from 'prop-types';
-import styled from 'styled-components';
-
-import {primaryColor} from '../utils/colors';
+import styled from 'styled-components/native';
 
 export default function Button({
   text,
   onPress,
-  children,
   style,
   textStyle,
   disabled,
@@ -25,7 +22,7 @@ export default function Button({
         {loading ? (
           <ActivityIndicator size="large" color="#ffffff" />
         ) : (
-          children || <Text style={textStyle}>{text}</Text>
+          <Text style={textStyle}>{text}</Text>
         )}
       </Container>
     </TouchableWithoutFeedback>
@@ -50,14 +47,14 @@ Button.defaultProps = {
 };
 
 const Container = styled.View`
-  height: 55px;
-  background-color: ${primaryColor};
-  border-radius: 25px;
-  padding-horizontal: 20px;
-  overflow: hidden;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  height: 50px;
+  background-color: #235161;
+  border-radius: 10px;
+  padding: 5px;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
 `;
 
 export const Text = styled.Text`
