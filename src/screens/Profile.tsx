@@ -2,67 +2,77 @@
 import React from 'react';
 import {useSelector} from 'react-redux';
 import styled from 'styled-components/native';
-
+import Header from '../components/Header';
+import {useNavigation} from '@react-navigation/native';
 // Internal dependencies
 import {SCREEN_WIDTH} from '../utils/constants';
 import fonts from '../utils/fonts';
+import {ScrollView} from 'react-native';
 
 const ProfileScreen = () => {
   // Redux
   // @ts-ignore
+  const navigation = useNavigation();
   const user = useSelector(state => state.user);
 
   return (
     <Container>
-      <AvatarContainer>
-        <AvatarInnerContainer>
-          <Avatar source={{uri: user.foto}} />
-        </AvatarInnerContainer>
-      </AvatarContainer>
+      <Header
+        title="Perfil"
+        isGoBack
+        onPressLeftButton={() => navigation.goBack()}
+      />
+      <ScrollView>
+        <AvatarContainer>
+          <AvatarInnerContainer>
+            <Avatar source={{uri: user?.foto}} />
+          </AvatarInnerContainer>
+        </AvatarContainer>
 
-      <FormContainer>
-        <FormItem>
-          <Label>Nombre(s)</Label>
+        <FormContainer>
+          <FormItem>
+            <Label>Nombre(s)</Label>
 
-          <Value>{user?.first_name || 'Sin información'}</Value>
-        </FormItem>
+            <Value>{user?.first_name || 'Sin información'}</Value>
+          </FormItem>
 
-        <FormItem>
-          <Label>Apellido Paterno</Label>
+          <FormItem>
+            <Label>Apellido Paterno</Label>
 
-          <Value>{user?.last_name || 'Sin información'}</Value>
-        </FormItem>
+            <Value>{user?.last_name || 'Sin información'}</Value>
+          </FormItem>
 
-        <FormItem>
-          <Label>Apellido Materno</Label>
+          <FormItem>
+            <Label>Apellido Materno</Label>
 
-          <Value>{user?.second_last_name || 'Sin información'}</Value>
-        </FormItem>
+            <Value>{user?.second_last_name || 'Sin información'}</Value>
+          </FormItem>
 
-        <FormItem>
-          <Label>Correo electrónico</Label>
+          <FormItem>
+            <Label>Correo electrónico</Label>
 
-          <Value>{user?.email || 'Sin información'}</Value>
-        </FormItem>
+            <Value>{user?.email || 'Sin información'}</Value>
+          </FormItem>
 
-        <FormItem>
-          <Label>Correo alternativo</Label>
+          <FormItem>
+            <Label>Correo alternativo</Label>
 
-          <Value>{user?.email_alternativo || 'Sin información'}</Value>
-        </FormItem>
+            <Value>{user?.email_alternativo || 'Sin información'}</Value>
+          </FormItem>
 
-        <FormItem>
-          <Label>Lada</Label>
+          <FormItem>
+            <Label>Lada</Label>
 
-          <Value>{user?.lada || 'Sin información'}</Value>
-        </FormItem>
+            <Value>{user?.lada?.lada || 'Sin información'}</Value>
+          </FormItem>
 
-        <FormItem>
-          <Label>Número de teléfono</Label>
+          <FormItem>
+            <Label>Número de teléfono</Label>
 
-          <Value>{user?.numero_de_celular || 'Sin información'}</Value>
-        </FormItem>
-      </FormContainer>
+            <Value>{user?.numero_de_celular || 'Sin información'}</Value>
+          </FormItem>
+        </FormContainer>
+      </ScrollView>
     </Container>
   );
 };

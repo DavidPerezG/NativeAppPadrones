@@ -20,27 +20,10 @@ const PreviewPDF = ({route}) => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    imprimirObligaciones();
-  }, []);
-
-  const imprimirObligaciones = async () => {
-    try {
-      setIsLoading(true);
-      const response = await http.post(
-        '/cuentaunicasir/opinion-de-las-obligaciones/pdf/',
-        {
-          padron_id: route.params.padron_id,
-          tipo_de_padron: route.params.tipo_de_padron,
-        },
-      );
-      if (response?.status === 200) {
-        setBase64(`data:application/pdf;base64,${response.data.data}`);
-      }
-      setIsLoading(false);
-    } catch (err) {
-      console.error(err);
+    if (route.params.base64) {
+      setBase64(route.params.base64);
     }
-  };
+  }, []);
 
   return (
     <>
@@ -49,24 +32,14 @@ const PreviewPDF = ({route}) => {
         onPressLeftButton={navigation.goBack}
         title="Previewer"
       />
+      {/* <Button text="Enviar a Correo" />
+      <Button text="Enviar a MiCuentaMX" /> */}
       <Center>
         {isLoading ? (
           <ActivityIndicator color={'gray'} size={'large'} />
         ) : (
           <Pdf
             source={{uri: base64}}
-            onLoadComplete={(numberOfPages, filePath) => {
-              console.log(`Number of pages: ${numberOfPages}`);
-            }}
-            onPageChanged={(page, numberOfPages) => {
-              console.log(`Current page: ${page}`);
-            }}
-            onError={error => {
-              console.log(error);
-            }}
-            onPressLink={uri => {
-              console.log(`Link pressed: ${uri}`);
-            }}
             style={{
               flex: 1,
               width: Dimensions.get('window').width,

@@ -31,7 +31,6 @@ const getCiudadano = async (search, advanceSearch) => {
     })
     .then(
       response => {
-        console.log(response.data.results);
         result = response.data.results;
       },
       error => {
@@ -156,9 +155,6 @@ const getEmpresa = async (search, advanceSearch) => {
 //Agarra todos los adeudos/cargos de un padron, tomando como base su numero de padron
 const getAdeudoPadron = async (padron, numeroPadron) => {
   let result;
-  console.log('info despue');
-  console.log(padron.id);
-  console.log(numeroPadron);
   if (padron !== undefined && padron !== null) {
     await http
       .post('recaudacion/consulta-caja/padron/', {
@@ -169,7 +165,6 @@ const getAdeudoPadron = async (padron, numeroPadron) => {
       })
       .then(
         response => {
-          console.log(response);
           result = response.data;
         },
         error => {
@@ -179,8 +174,6 @@ const getAdeudoPadron = async (padron, numeroPadron) => {
   } else {
     result = null;
   }
-  console.log('terminado el despues');
-  console.log(result);
   return result;
 };
 

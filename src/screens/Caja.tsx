@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {FlatList} from 'react-native';
+import {ActivityIndicator, FlatList} from 'react-native';
 import styled from 'styled-components/native';
 
 import {getPadrones} from '../services/catalagos';
@@ -25,12 +25,15 @@ const iconsCard = {
 
 const Caja = () => {
   const [padrones, setPadrones] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation();
 
   const fetchPadron = async () => {
+    setIsLoading(true);
     const response = await getPadrones();
     setPadrones(response);
+    setIsLoading(false);
   };
 
   const goBack = () => {
@@ -44,7 +47,7 @@ const Caja = () => {
   return (
     <Container>
       <Header title="Elegir Padron" />
-
+      {isLoading ? <ActivityIndicator size={'large'} color="#235161" /> : null}
       <FlatList
         data={padrones}
         renderItem={({item}) => (
@@ -56,6 +59,7 @@ const Caja = () => {
             handleClick={false}
             navProps={navigation}
             onPress={() => goBack(item.model)}
+            unable={item.model !== 'Ciudadano' ? true : false}
           />
         )}
         keyExtractor={item => item.id}

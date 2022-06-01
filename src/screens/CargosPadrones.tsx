@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableWithoutFeedback,
 } from 'react-native';
+import http from '../services/http';
 import styled from 'styled-components/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
@@ -24,12 +25,18 @@ import {
   getPredio,
   getVehiculo,
 } from '../services/padrones';
+import {
+  imprimirObligaciones,
+  imprimirConstancia,
+  getRecibos,
+} from '../services/cajaPdf';
 import {useSelector} from 'react-redux';
 
 import fonts from '../utils/fonts';
 import Header from '../components/Header';
 import CardItem from '../components/CardItem';
 import Button from '../components/DefaultButton';
+import DropdownButton from '../components/DropdownButton';
 
 const iconsCard = {
   Ciudadano: {numero: 1, variableDeNombre: 'nombre_completo'},
@@ -45,19 +52,24 @@ const CargosPadrones = ({route}) => {
   const [resultCargos, setResultCargos] = useState();
   const [newData, setNewData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingObligaciones, setLoadingObligaciones] = useState(false);
+  const [loadingSituacion, setLoadingSituacion] = useState(false);
   const [importeTotal, setImporteTotal] = useState(0);
   const [nombrePadron, setNombrePadron] = useState();
   const [numeroPadron, setNumeroPadron] = useState();
-  const [base64, setBase64] = useState();
+  const [contribuyente, setContribuyente] = useState();
 
   const navigation = useNavigation();
   const hasCorte = useSelector(state => Boolean(state.user.corte));
 
   const handleFirstConfig = async () => {
+    if (contribuyente === undefined && nombrePadron === 'Ciudadano') {
+      setContribuyente(route.params.data);
+    }
     let response = await getAdeudoPadron(route.params.data, numeroPadron);
     setPadronId(response?.id);
     let total = 0;
-    if (response.cargos[0] !== undefined) {
+    if (response?.cargos[0] !== undefined) {
       response?.cargos?.map(cargo => {
         let cargoData = reduceArrCargos(cargo);
         total += cargoData.adeudo_total;
@@ -66,8 +78,9 @@ const CargosPadrones = ({route}) => {
     } else {
       setResultCargos(undefined);
     }
+    console.log(response);
     setNameSearch(route.params.data[iconsCard[nombrePadron]?.variableDeNombre]);
-    setImporteTotal(total);
+    setImporteTotal(Math.round(total));
     setNewData(true);
     setIsLoading(false);
   };
@@ -79,13 +92,12 @@ const CargosPadrones = ({route}) => {
   }, [route.params.data]);
 
   useEffect(() => {
-    checkCorte();
-  }, []);
-
-  useEffect(() => {
     setNombrePadron(route.params.padronNombre);
     setNumeroPadron(iconsCard[route.params.padronNombre]?.numero);
   }, [route.params.padronNombre]);
+  useEffect(() => {
+    setNombrePadron('Ciudadano');
+  }, []);
 
   const reduceArrCargos = cargo => {
     const {
@@ -236,6 +248,32 @@ const CargosPadrones = ({route}) => {
     };
   };
 
+  // const getTotalPadron = (cargos, keys) => {
+  //   let ttl = 0;
+  //   if (selectedRowKeys.length === data.length) {
+  //     if (cargos.length) {
+  //       const filtered = cargos.filter(e => keys.includes(e.id));
+  //       ttl = filtered.reduce((accum, curr) => accum + curr.adeudo_total, 0);
+  //     }
+  //   }
+  //   return redondeo ? Math.round(ttl) : ttl;
+  // };
+
+  // const getTotal = () => {
+  //   let ttl = 0;
+  //   if (selectedRowKeys.length === data.length) {
+  //     data.forEach((item, idx) => {
+  //       const keys = [...selectedRowKeys[idx]];
+  //       const cargos = item.cargos.filter(e => keys.includes(e.id));
+  //       ttl += cargos.reduce((accum, curr) => accum + curr.adeudo_total, 0);
+  //     });
+  //   }
+
+  //   return redondeo
+  //     ? Math.round(parseFloat(ttl).toFixed(2))
+  //     : parseFloat(ttl).toFixed(2);
+  // };
+
   const checkCorte = () => {
     if (hasCorte) {
       showAlert('Ya se encuentra un corte abierto', 'Alerta');
@@ -257,6 +295,7 @@ const CargosPadrones = ({route}) => {
     let numeroDePadron;
     if (nombrePadron === 'Ciudadano') {
       response = await getCiudadano(searchData, formData);
+      console.log(response);
       numeroDePadron = 1;
     } else if (nombrePadron === 'Empresa') {
       response = await getEmpresa(searchData, formData);
@@ -284,6 +323,12 @@ const CargosPadrones = ({route}) => {
         data: response,
       });
     } else {
+      console.log(contribuyente === undefined);
+      console.log(nombrePadron === 'Ciudadano');
+      if (contribuyente === undefined && nombrePadron === 'Ciudadano') {
+        console.log('contribuyentes 2');
+        setContribuyente(response);
+      }
       //Solo hay un dato para poner en caja, procede
       setPadronId(response[0].id);
       let result = await getAdeudoPadron(response[0], numeroDePadron);
@@ -294,12 +339,10 @@ const CargosPadrones = ({route}) => {
       });
       setResultCargos(result?.cargos);
       setNewData(true);
-      setNameSearch(
-        response[0][iconsCard[route.params.padronNombre]?.variableDeNombre],
-      );
-      setImporteTotal(total);
-      console.log('cargos de busqueda');
-      console.log(resultCargos);
+      setNameSearch(response[0][iconsCard[nombrePadron]?.variableDeNombre]);
+      setImporteTotal(Math.round(total));
+      console.log('contribuyente 3');
+      console.log(contribuyente);
     }
   };
 
@@ -307,6 +350,7 @@ const CargosPadrones = ({route}) => {
   const handleSearch = async formData => {
     setIsLoading(true);
     setNewData(false);
+
     if ((searchText === null || searchText === '') && formData === undefined) {
       showAlert('Escriba algo en la busqueda');
     } else if (
@@ -325,25 +369,84 @@ const CargosPadrones = ({route}) => {
     setIsLoading(false);
   };
 
+  const handleSearchContribuyente = formData => {
+    if ((searchText === null || searchText === '') && formData === undefined) {
+      showAlert('Escriba algo en la busqueda');
+    } else {
+      setIsLoading(true);
+      setNewData(false);
+      setNombrePadron('Ciudadano');
+      handleGetOneData(searchText, formData);
+      setIsLoading(false);
+    }
+  };
+
   //Guarda el nombre en variable de estado de el dato correspondiente a su padrón
 
   const calcular = async () => {
     setIsLoading(true);
-    if (importeTotal !== 0) {
-      let paymentResponse = await NativeModules.RNNetPay.doTrans(
-        importeTotal.toFixed(2),
-      );
-      console.log(paymentResponse.success);
+    if (hasCorte) {
+      if (importeTotal !== 0) {
+        let paymentResponse = await NativeModules.RNNetPay.doTrans(
+          importeTotal.toFixed(2),
+        );
+        if (paymentResponse.success === true) {
+          console.log('payment');
+          console.log(paymentResponse.success === true);
+          let recibos = await getRecibos(
+            padronId,
+            [{metodo: 1, importe: importeTotal}],
+            [
+              {
+                cargos: resultCargos?.map(cargo => {
+                  return cargo.id;
+                }),
+                padron_id: padronId,
+                tipo_de_padron: numeroPadron,
+              },
+            ],
+          );
+          console.log(recibos);
+          console.log(recibos.recibos);
+          navigation.navigate('recibos-de-caja', {recibos});
+        } else {
+          showAlert('Error en el pago', 'Problema en la transaccion');
+        }
+      } else {
+        showAlert('Cantidad Invalida', 'Problema en la transacción');
+      }
     } else {
-      showAlert('Cantidad Invalida', 'Problema en la transacción');
+      showAlert('Se requiere un corte abierto', 'No se puede proceder');
     }
 
     setIsLoading(false);
   };
 
+  const handleObligacionesPdf = async () => {
+    setLoadingObligaciones(true);
+    const response = await imprimirObligaciones(contribuyente?.[0].id, 1);
+    setLoadingObligaciones(false);
+    if (response) {
+      navigation.navigate('preview-pdf', {base64: response});
+    }
+  };
+
+  const handleSituacionPdf = async () => {
+    setLoadingSituacion(true);
+    const response = await imprimirConstancia(contribuyente?.[0].id);
+    setLoadingSituacion(false);
+    if (response) {
+      navigation.navigate('preview-pdf', {base64: response});
+    }
+  };
+
   return (
     <Container>
-      <Header title="Cargos" isGoBack />
+      <Header
+        title="Cargos"
+        isGoBack
+        onPressLeftButton={() => navigation.goBack()}
+      />
 
       <MenuContainer>
         <SearchInput>
@@ -354,7 +457,10 @@ const CargosPadrones = ({route}) => {
           />
           <TouchableWithoutFeedback
             onPress={() => {
-              handleSearch();
+              console.log(contribuyente);
+              contribuyente === undefined
+                ? handleSearchContribuyente()
+                : handleSearch();
             }}>
             <SearchButton>
               <FontAwesome5 name={'search'} size={30} solid color={'white'} />
@@ -373,51 +479,44 @@ const CargosPadrones = ({route}) => {
             <BusquedaAvanzadaVehiculo onSearch={handleSearch} />
           ) : null}
         </SearchInput>
-
         <Linepx />
+        {contribuyente ? (
+          <TouchableWithoutFeedback onPress={() => navigation.navigate('caja')}>
+            <AddButton>
+              <FontAwesome5 name={'plus'} size={19} solid color={'#841F36'} />
 
-        <TouchableWithoutFeedback onPress={() => navigation.navigate('caja')}>
-          <AddButton>
-            <FontAwesome5 name={'plus'} size={19} solid color={'#841F36'} />
-
-            <Label>
-              {route.params.padronNombre !== 'Caja' && route.params.padronNombre
-                ? route.params.padronNombre
-                : 'Seleccionar Padron'}
-            </Label>
-          </AddButton>
-        </TouchableWithoutFeedback>
-
+              <Label>
+                {route.params.padronNombre !== 'Caja' &&
+                route.params.padronNombre
+                  ? route.params.padronNombre
+                  : 'Seleccionar Padron'}
+              </Label>
+            </AddButton>
+          </TouchableWithoutFeedback>
+        ) : (
+          <LabelContribuyente>Buscar Contribuyente</LabelContribuyente>
+        )}
         <Linepx />
         <ScrollView>
-          {newData === true
-            ? resultCargos?.map((cargo, index) => {
+          {newData === true ? (
+            <DropdownButton
+              padron={nombrePadron}
+              nombre={nameSearch}
+              cargo={importeTotal}
+              children={resultCargos?.map((cargo, index) => {
                 var dataCargo = reduceArrCargos(cargo);
                 return (
                   <CardItem
                     key={index}
-                    info={
-                      '' +
-                      route.params.padronNombre +
-                      ': ' +
-                      nameSearch +
-                      ' $' +
-                      dataCargo?.adeudo_total
-                    }
+                    info={cargo.descripcion + ' $' + dataCargo?.adeudo_total}
                     cargo={cargo}
+                    reduceCargo={reduceArrCargos(cargo)}
                     navegar="detallesPadron"
                   />
                 );
-              })
-            : null}
-          {newData === true &&
-          (resultCargos?.[0] === undefined ||
-            resultCargos === [] ||
-            resultCargos === null) ? (
-            <CardItem info={nameSearch + ' $ 0.00'} navegar="detallesPadron" />
-          ) : (
-            console.log(resultCargos?.[0])
-          )}
+              })}
+            />
+          ) : null}
 
           {isLoading ? (
             <ActivityIndicator size="large" color="#fc9696" />
@@ -431,29 +530,29 @@ const CargosPadrones = ({route}) => {
         </LabelContainer>
         {padronId ? (
           <Button
+            loading={loadingObligaciones}
             text="Imprimir Opinión de Obligaciones"
             style={{height: 40, marginBottom: 7}}
-            onPress={() =>
-              navigation.navigate('preview-pdf', {
-                padron_id: padronId,
-                tipo_de_padron: numeroPadron,
-              })
-            }
+            onPress={() => {
+              handleObligacionesPdf();
+            }}
           />
         ) : null}
-
-        <Button text="Imprimir Situación" style={{height: 40}} />
+        {padronId ? (
+          <Button
+            loading={loadingSituacion}
+            text="Imprimir Situación"
+            style={{height: 40}}
+            onPress={() => {
+              handleSituacionPdf();
+            }}
+          />
+        ) : null}
         <Row>
           <TouchableWithoutFeedback onPress={calcular}>
             <PaymentButton>
               <LabelButton>Pagar Total</LabelButton>
             </PaymentButton>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback
-            onPress={() => navigation.navigate('recibos-de-caja')}>
-            <ReceiptButton>
-              <LabelButton>Recibo</LabelButton>
-            </ReceiptButton>
           </TouchableWithoutFeedback>
         </Row>
       </Footer>
@@ -499,9 +598,9 @@ const Row = styled.View`
 `;
 
 const PaymentButton = styled.View`
-  width: 73%;
+  width: 100%;
   height: 50px;
-  background-color: #235161;
+  background-color: #1aa68a;
   border-radius: 10px;
   padding: 5px;
   flex-direction: row;
@@ -527,6 +626,15 @@ const Label = styled.Text`
   font-weight: bold;
   color: #841f36;
   font-size: 16px;
+  margin-horizontal: 5px;
+`;
+
+const LabelContribuyente = styled.Text`
+  font-family: ${fonts.bold};
+  font-weight: bold;
+  color: #6a6a6a;
+  font-size: 16px;
+  text-align: center;
   margin-horizontal: 5px;
 `;
 

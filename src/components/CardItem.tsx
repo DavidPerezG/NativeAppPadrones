@@ -6,7 +6,15 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 import fonts from '../utils/fonts';
 
-const CardItem = ({navegar, info, selectType, data, padron, cargo}) => {
+const CardItem = ({
+  navegar,
+  info,
+  selectType,
+  data,
+  padron,
+  cargo,
+  reduceCargo,
+}) => {
   const navigation = useNavigation();
 
   return (
@@ -20,7 +28,10 @@ const CardItem = ({navegar, info, selectType, data, padron, cargo}) => {
         })
       }>
       <Container>
-        <Label>{info}</Label>
+        <Label>
+          {info < 35 ? info : `${info?.substring(0, 32)}...`}
+          {reduceCargo ? reduceCargo?.adeudo_total : null}
+        </Label>
         <FontAwesome5
           name={'chevron-right'}
           size={19}
@@ -49,10 +60,10 @@ const Container = styled.View`
 `;
 
 const Label = styled.Text`
-  font-family: ${fonts.bold};
-  font-weight: bold;
+  font-family: ${fonts.light};
+  font-weight: normal;
   color: #141414;
-  font-size: 16px;
+  font-size: 12px;
   flex: 1;
 `;
 export default CardItem;

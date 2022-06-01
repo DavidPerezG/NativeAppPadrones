@@ -1,6 +1,6 @@
 // Internal dependencies
 import React from 'react';
-import {StyleSheet, Text, View, TouchableWithoutFeedback} from 'react-native';
+import {StyleSheet, Text, View, TouchableWithoutFeedback, Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch} from 'react-redux';
@@ -18,8 +18,19 @@ const MenuCard = props => {
   // Redux
   const dispatch = useDispatch();
 
+  const showAlert = (mensaje, titulo) =>
+    Alert.alert(`${titulo || 'Problema en la busqueda'}`, mensaje, [
+      {
+        text: 'Entendido',
+        style: 'cancel',
+      },
+    ]);
+
   const handleClick = () => {
-    if (props.navPage === 'cargosPadrones') {
+    if(props.unable === true){
+      showAlert('Disculpa la molestia', 'En Desarrollo')
+    } else {
+      if (props.navPage === 'cargosPadrones') {
       global.padronSeleccionado = props.nombreItem;
       navigation.navigate('cargosPadrones', {padronNombre: props.nombreItem});
       return null;
@@ -37,6 +48,8 @@ const MenuCard = props => {
       // @ts-ignore
       props.navPage ? navigation.navigate(props.navPage) : false;
     }
+    }
+    
   };
 
   if (isBlank) {

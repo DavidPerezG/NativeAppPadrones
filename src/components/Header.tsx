@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     borderBottomEndRadius: 15,
     borderBottomLeftRadius: 15,
     padding: 20,
-    marginBottom: 14,
+    marginBottom: 10,
   },
   textContainer: {
     flex: 1,

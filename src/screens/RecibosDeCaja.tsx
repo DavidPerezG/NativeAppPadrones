@@ -1,7 +1,9 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, FlatList} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
+
+import {getBase64Recibos, getBase64Ticket} from '../services/cajaPdf';
 
 import fonts from '../utils/fonts';
 
@@ -37,22 +39,48 @@ const DatosTabla = [
 // Interfaces & Types
 interface IRecibosDeCajaProps {}
 
-const RecibosDeCaja = () => {
+const RecibosDeCaja = ({route}) => {
+  const [recibos, setRecibos] = useState();
+  const [loadingRecibo, setLoadingRecibo] = useState(false);
+  const [loadingTicket, setLoadingTicket] = useState(false);
+
   const navigation = useNavigation();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    setRecibos(route.params?.recibos);
+  }, []);
+
+  const getRecibo = async () => {
+    setLoadingRecibo(true);
+    const base64 = await getBase64Recibos(recibos?.recibos?.[0].id);
+    navigation.navigate('preview-pdf', {base64});
+    setLoadingRecibo(false);
+  };
+
+  const getTicket = async () => {
+    setLoadingTicket(true);
+    const base64 = await getBase64Ticket(recibos?.recibos?.[0].id);
+    navigation.navigate('preview-pdf', {base64});
+    setLoadingRecibo(false);
+  };
 
   return (
     <Container>
       <Header title="Recibos" isGoBack onPressLeftButton={navigation.goBack} />
       <MainContainer>
         <Button
+          loading={loadingRecibo}
           text="Ver Recibo"
           style={{marginBottom: 10}}
-          onPress={() => navigation.navigate('preview-pdf')}
+          onPress={() => getRecibo()}
         />
-        <Button text="Imprimir Ticket" style={{marginBottom: 10}} />
-        <Button text="Facturar" style={{marginBottom: 10}} />
+        <Button
+          loading={loadingTicket}
+          text="Imprimir Ticket"
+          style={{marginBottom: 10}}
+          onPress={() => getTicket()}
+        />
+        {/* <Button text="Facturar" style={{marginBottom: 10}} /> */}
 
         <FlatList
           data={DatosTabla}

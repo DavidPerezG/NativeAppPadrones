@@ -8,6 +8,7 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -68,102 +69,108 @@ const BusquedaAvanzadaCiudadano = ({onSearch}) => {
           <View style={styles.modal}>
             <Text style={styles.textHeader}>Busqueda Avanzada</Text>
             <View style={styles.line} />
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Clave Ciudadana </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('clave_ciudadana', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Clave Ciudadana"
-                />
+            <ScrollView style={{height: Dimensions.get('window').height * 0.3}}>
+              <View style={styles.textInput}>
+                <Text style={styles.label}>Clave Ciudadana </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text => handleChange('clave_ciudadana', text)}
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="Clave Ciudadana"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Nombre </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('first_name', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Nombre"
-                />
+              <View style={styles.textInput}>
+                <Text style={styles.label}>Nombre </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text => handleChange('first_name', text)}
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="Nombre"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Apellido Paterno </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('last_name', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Apellido Paterno"
-                />
+              <View style={styles.textInput}>
+                <Text style={styles.label}>Apellido Paterno </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text => handleChange('last_name', text)}
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="Apellido Paterno"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Apellido Materno </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('second_last_name', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Apellido Materno"
-                />
+              <View style={styles.textInput}>
+                <Text style={styles.label}>Apellido Materno </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text =>
+                      handleChange('second_last_name', text)
+                    }
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="Apellido Materno"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Correo </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('email', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Correo"
-                />
+              <View style={styles.textInput}>
+                <Text style={styles.label}>Correo </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text => handleChange('email', text)}
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="Correo"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>No. Celular </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('numero_de_celular', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="No. Celular"
-                />
+              <View style={styles.textInput}>
+                <Text style={styles.label}>No. Celular </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text =>
+                      handleChange('numero_de_celular', text)
+                    }
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="No. Celular"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>CURP </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('CURP', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="CURP"
-                />
+              <View style={styles.textInput}>
+                <Text style={styles.label}>CURP </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text => handleChange('CURP', text)}
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="CURP"
+                  />
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>RFC </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('RFC', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="RFC"
-                />
+              <View style={styles.textInput}>
+                <Text style={styles.label}>RFC </Text>
+                <View style={styles.textInputContainer}>
+                  <TextInput
+                    onChangeText={text => handleChange('RFC', text)}
+                    color="black"
+                    placeholderTextColor="#919191"
+                    style={styles.textInputStyle}
+                    placeholder="RFC"
+                  />
+                </View>
               </View>
-            </View>
+            </ScrollView>
             <TouchableWithoutFeedback onPress={handleSearch}>
               <View style={styles.buttonPrint}>
                 <Text style={styles.text}>Buscar</Text>
@@ -205,6 +212,7 @@ const styles = StyleSheet.create({
   modal: {
     backgroundColor: 'white',
     width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height * 0.7,
     alignItems: 'center',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

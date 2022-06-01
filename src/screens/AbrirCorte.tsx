@@ -3,7 +3,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import styled from 'styled-components/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useDispatch} from 'react-redux';
-import {ActivityIndicator, TouchableWithoutFeedback} from 'react-native';
+import {ActivityIndicator, TouchableWithoutFeedback, Alert} from 'react-native';
 
 // Internal dependencies
 import Header from '../components/Header';
@@ -36,6 +36,14 @@ const AbrirCorteScreen = () => {
   useEffect(() => {
     fetchUnidades();
   }, []);
+
+  const showAlert = (mensaje, titulo) =>
+    Alert.alert(`${titulo || 'Problema en la busqueda'}`, mensaje, [
+      {
+        text: 'Entendido',
+        style: 'cancel',
+      },
+    ]);
 
   // Handlers
   const fetchUnidades = async () => {
@@ -71,14 +79,17 @@ const AbrirCorteScreen = () => {
 
     // @ts-ignore
     const response = await abrirCorte(total, unidadDeRecaudacion.id);
-
-    if (response) {
+    console.log('corte');
+    console.log(response);
+    if (!response.response === null) {
       dispatchSetCorte(dispatch, response);
       navigation.reset({
         index: 0,
         // @ts-ignore
         routes: [{name: 'menu'}],
       });
+    } else {
+      showAlert(response?.message, 'Error al abrir corte');
     }
 
     setIsLoading(false);
@@ -87,7 +98,11 @@ const AbrirCorteScreen = () => {
   return (
     <>
       <Container>
-        <Header title="Abrir Corte" />
+        <Header
+          title="Abrir Corte"
+          isGoBack
+          onPressLeftButton={() => navigation.goBack()}
+        />
 
         <KeyboardAwareScrollView
           // eslint-disable-next-line react-native/no-inline-styles

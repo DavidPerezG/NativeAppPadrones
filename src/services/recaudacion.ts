@@ -15,9 +15,10 @@ const abrirCorte = async (totalDelFondo, unidadDeRecaudacionId) => {
       return response?.data;
     }
   } catch (error) {
+    console.log(error?.response?.data);
     console.error(error, error?.response?.data?.detail);
+    return {response: null, message: error?.response?.data?.detail};
   }
-  return null;
 };
 
 export type TMetodosDePagoProps = {
