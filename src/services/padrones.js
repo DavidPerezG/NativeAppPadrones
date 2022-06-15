@@ -77,7 +77,7 @@ const getVehiculo = async (search, advanceSearch) => {
     })
     .then(
       response => {
-        result = response.data[0];
+        result = response.data;
       },
       error => {
         console.error(error);
@@ -113,7 +113,7 @@ const getPredio = async (search, advanceSearch) => {
     })
     .then(
       response => {
-        result = response.data[0];
+        result = response.data;
       },
       error => {
         console.error(error);
@@ -123,8 +123,37 @@ const getPredio = async (search, advanceSearch) => {
   return result;
 };
 
-const getEmpresa = async (search, advanceSearch) => {
-  let urlEndpoint = 'empresas/empresa-caja/';
+const getEmpresa = async (search, advanceSearch, nombrePadron) => {
+  let urlEndpoint = 'empresas/' + nombrePadron.toLowerCase() + '-caja/';
+  let result;
+  await http
+    .get(urlEndpoint, {
+      params: {
+        q: search,
+        razon_social: advanceSearch?.razon_social,
+        nombre_comercial: advanceSearch?.nombre_comercial,
+        pagina_web: advanceSearch?.pagina_web,
+        RFC: advanceSearch?.RFC,
+        tipo_de_establecimiento: advanceSearch?.tipo_de_establecimiento,
+        domicilio_fiscal__codigo_postal: advanceSearch?.codigo_postal,
+        domicilio_fiscal_calle_principal: advanceSearch?.calle_principal,
+        domicilio_fiscal__numero_exterior: advanceSearch?.numero_exterior,
+      },
+    })
+    .then(
+      response => {
+        result = response.data;
+      },
+      error => {
+        console.error(error);
+      },
+    );
+
+  return result;
+};
+
+const getAgencia = async (search, advanceSearch) => {
+  let urlEndpoint = 'empresas/agencia-caja/';
   let result;
   await http
     .get(urlEndpoint, {
@@ -184,5 +213,6 @@ export {
   getVehiculo,
   getPredio,
   getEmpresa,
+  getAgencia,
   getAdeudoPadron,
 };

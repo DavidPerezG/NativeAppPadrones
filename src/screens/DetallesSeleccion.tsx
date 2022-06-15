@@ -111,7 +111,7 @@ const DetallesSeleccion = ({route}) => {
       <MenuContainer>
         <TitleLabel>{route.params.nombrePadron}</TitleLabel>
         <FlatList
-          data={DatosTabla[route.params.nombrePadron]}
+          data={DatosTabla[route.params.nombrePadron] || DatosTabla.Empresa}
           renderItem={({item, index}) => (
             <Row>
               <DataLabel>{item.title}</DataLabel>
@@ -127,7 +127,9 @@ const DetallesSeleccion = ({route}) => {
               data: route.params.data,
             });
           }}>
-          <TitleLabel>Seleccionar</TitleLabel>
+          <SelectButton>
+            <SelectText>Seleccionar</SelectText>
+          </SelectButton>
         </TouchableWithoutFeedback>
       </MenuContainer>
     </Container>
@@ -151,6 +153,14 @@ const TitleLabel = styled.Text`
   margin-horizontal: 5px;
 `;
 
+const SelectText = styled.Text`
+  font-family: ${fonts.bold};
+  font-weight: bold;
+  color: #ffffff;
+  font-size: 25px;
+  margin-horizontal: 5px;
+`;
+
 const DataLabel = styled.Text`
   font-family: ${fonts.medium};
   color: #353535;
@@ -165,14 +175,15 @@ const Linepx = styled.View`
 `;
 
 const SelectButton = styled.View`
-  height: 55px;
-  background-color: white;
-  border-radius: 25px;
-  padding-horizontal: 20px;
-  overflow: hidden;
-  justify-content: center;
-  align-items: center;
+  width: 100%;
+  height: 50px;
+  background-color: #235161;
+  border-radius: 10px;
+  padding: 5px;
   flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-vertical: 10px;
 `;
 
 const Row = styled.View`

@@ -59,7 +59,6 @@ const Caja = () => {
             handleClick={false}
             navProps={navigation}
             onPress={() => goBack(item.model)}
-            unable={item.model !== 'Ciudadano' ? true : false}
           />
         )}
         keyExtractor={item => item.id}

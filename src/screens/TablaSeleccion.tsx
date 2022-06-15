@@ -11,6 +11,15 @@ const nameVarPadron = {
   Predio: 'descripcion',
   Empresa: 'razon_social',
   Vehiculo: 'id',
+  Hospedaje: 'razon_social',
+  Arrendamiento: 'razon_social',
+  Nomina: 'razon_social',
+  Alcohol: 'razon_social',
+  Cedular: 'razon_social',
+  'Juego-de-azar': 'razon_social',
+  Notario: 'razon_social',
+  'Casa-de-empenio': 'razon_social',
+  Agencia: 'razon_social',
 };
 
 const TablaSeleccion = ({route}) => {
@@ -19,6 +28,7 @@ const TablaSeleccion = ({route}) => {
 
   useEffect(() => {
     setData(route.params.data);
+    console.log(data[0]);
     setNombrePadron(route.params.nombrePadron);
     listData();
   }, []);

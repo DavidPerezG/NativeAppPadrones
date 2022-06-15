@@ -52,21 +52,43 @@ const RecibosDeCaja = ({route}) => {
 
   const getRecibo = async () => {
     setLoadingRecibo(true);
-    const base64 = await getBase64Recibos(recibos?.recibos?.[0].id);
+    const base64 = await getBase64Recibos(
+      recibos?.recibos?.map(recibo => {
+        return recibo.id;
+      }),
+    );
     navigation.navigate('preview-pdf', {base64});
     setLoadingRecibo(false);
   };
 
   const getTicket = async () => {
     setLoadingTicket(true);
-    const base64 = await getBase64Ticket(recibos?.recibos?.[0].id);
+    const base64 = await getBase64Ticket(
+      recibos?.recibos?.map(recibo => {
+        return recibo.id;
+      }),
+    );
     navigation.navigate('preview-pdf', {base64});
-    setLoadingRecibo(false);
+    setLoadingTicket(false);
   };
 
   return (
     <Container>
-      <Header title="Recibos" isGoBack onPressLeftButton={navigation.goBack} />
+      <Header
+        title="Recibos"
+        isGoBack
+        onPressLeftButton={() =>
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                // @ts-ignore
+                name: 'menu',
+              },
+            ],
+          })
+        }
+      />
       <MainContainer>
         <Button
           loading={loadingRecibo}

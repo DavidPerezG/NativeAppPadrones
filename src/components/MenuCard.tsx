@@ -1,6 +1,12 @@
 // Internal dependencies
 import React from 'react';
-import {StyleSheet, Text, View, TouchableWithoutFeedback, Alert} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableWithoutFeedback,
+  Alert,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch} from 'react-redux';
@@ -27,29 +33,28 @@ const MenuCard = props => {
     ]);
 
   const handleClick = () => {
-    if(props.unable === true){
-      showAlert('Disculpa la molestia', 'En Desarrollo')
+    if (props.unable === true) {
+      showAlert('Disculpa la molestia', 'En Desarrollo');
     } else {
       if (props.navPage === 'cargosPadrones') {
-      global.padronSeleccionado = props.nombreItem;
-      navigation.navigate('cargosPadrones', {padronNombre: props.nombreItem});
-      return null;
-    }
+        global.padronSeleccionado = props.nombreItem;
+        navigation.navigate('cargosPadrones', {padronNombre: props.nombreItem});
+        return null;
+      }
 
-    if (props.navPage === 'login') {
-      dispatchClearAuth(dispatch);
+      if (props.navPage === 'login') {
+        dispatchClearAuth(dispatch);
 
-      navigation.reset({
-        index: 0,
+        navigation.reset({
+          index: 0,
+          // @ts-ignore
+          routes: [{name: props.navPage}],
+        });
+      } else {
         // @ts-ignore
-        routes: [{name: props.navPage}],
-      });
-    } else {
-      // @ts-ignore
-      props.navPage ? navigation.navigate(props.navPage) : false;
+        props.navPage ? navigation.navigate(props.navPage) : false;
+      }
     }
-    }
-    
   };
 
   if (isBlank) {

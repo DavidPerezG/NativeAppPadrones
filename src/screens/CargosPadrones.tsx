@@ -2,14 +2,18 @@ import React, {useState, useEffect} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   NativeModules,
   ScrollView,
   TouchableWithoutFeedback,
+  Text,
+  View,
 } from 'react-native';
 import http from '../services/http';
 import styled from 'styled-components/native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import {useNavigation} from '@react-navigation/native';
+import * as Moment from 'moment';
 
 import BusquedaAvanzadaCiudadano from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaCiudadano';
 import BusquedaAvanzadaPredio from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaPredio';
@@ -23,6 +27,7 @@ import {
   getCiudadano,
   getEmpresa,
   getPredio,
+  getAgencia,
   getVehiculo,
 } from '../services/padrones';
 import {
@@ -38,66 +43,99 @@ import CardItem from '../components/CardItem';
 import Button from '../components/DefaultButton';
 import DropdownButton from '../components/DropdownButton';
 
-const iconsCard = {
+const datosExtraPadrones = {
   Ciudadano: {numero: 1, variableDeNombre: 'nombre_completo'},
   Empresa: {numero: 2, variableDeNombre: 'razon_social'},
   Predio: {numero: 3, variableDeNombre: 'descripcion'},
   Vehiculo: {numero: 4, variableDeNombre: 'id'},
+  Hospedaje: {numero: 6, variableDeNombre: 'razon_social'},
+  Arrendamiento: {numero: 7, variableDeNombre: 'razon_social'},
+  Nomina: {numero: 8, variableDeNombre: 'razon_social'},
+  Alcohol: {numero: 9, variableDeNombre: 'razon_social'},
+  Cedular: {numero: 10, variableDeNombre: 'razon_social'},
+  'Juego-de-Azar': {numero: 11, variableDeNombre: 'razon_social'},
+  Notario: {numero: 12, variableDeNombre: 'razon_social'},
+  'Casa-de-empenio': {numero: 13, variableDeNombre: 'razon_social'},
+  Agencia: {numero: 14, variableDeNombre: 'razon_social'},
 };
 
 const CargosPadrones = ({route}) => {
   const [searchText, setSearchText] = useState('');
-  const [nameSearch, setNameSearch] = useState('');
-  const [padronId, setPadronId] = useState();
-  const [resultCargos, setResultCargos] = useState();
+  const [nameSearch, setNameSearch] = useState([]);
+
+  const [padronCorrespondiente, setPadronCorrespondiente] = useState([]);
+  const [resultCargos, setResultCargos] = useState([]);
+  const [resultArrCargos, setResultArrCargos] = useState([]);
+  const [resultPadrones, setResultPadrones] = useState([]);
+  const [contribuyente, setContribuyente] = useState();
+  const [importeTotal, setImporteTotal] = useState(0);
+
+  const [nombrePadron, setNombrePadron] = useState();
+  const [numeroPadron, setNumeroPadron] = useState();
+
   const [newData, setNewData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingObligaciones, setLoadingObligaciones] = useState(false);
   const [loadingSituacion, setLoadingSituacion] = useState(false);
-  const [importeTotal, setImporteTotal] = useState(0);
-  const [nombrePadron, setNombrePadron] = useState();
-  const [numeroPadron, setNumeroPadron] = useState();
-  const [contribuyente, setContribuyente] = useState();
 
   const navigation = useNavigation();
+  const corte = useSelector(state => state.user.corte);
   const hasCorte = useSelector(state => Boolean(state.user.corte));
-
-  const handleFirstConfig = async () => {
-    if (contribuyente === undefined && nombrePadron === 'Ciudadano') {
-      setContribuyente(route.params.data);
-    }
-    let response = await getAdeudoPadron(route.params.data, numeroPadron);
-    setPadronId(response?.id);
-    let total = 0;
-    if (response?.cargos[0] !== undefined) {
-      response?.cargos?.map(cargo => {
-        let cargoData = reduceArrCargos(cargo);
-        total += cargoData.adeudo_total;
-      });
-      setResultCargos(response?.cargos);
-    } else {
-      setResultCargos(undefined);
-    }
-    console.log(response);
-    setNameSearch(route.params.data[iconsCard[nombrePadron]?.variableDeNombre]);
-    setImporteTotal(Math.round(total));
-    setNewData(true);
-    setIsLoading(false);
-  };
 
   useEffect(() => {
     if (route.params.data) {
-      handleFirstConfig();
+      handleBuscarCargos(route.params.data);
     }
   }, [route.params.data]);
 
   useEffect(() => {
-    setNombrePadron(route.params.padronNombre);
-    setNumeroPadron(iconsCard[route.params.padronNombre]?.numero);
+    console.log('corriendo useEffect');
+    let padron = route.params.padronNombre;
+
+    if (padron === 'Juego de Azar') {
+      setNombrePadron('Juego-de-azar');
+      padron = 'Juego-de-azar';
+    }
+    if (padron === 'Casa De Empeño') {
+      setNombrePadron('Casa-de-empenio');
+      padron = 'Casa-de-empenio';
+    } else {
+      setNombrePadron(padron);
+    }
+
+    if (datosExtraPadrones.hasOwnProperty(padron)) {
+      setNumeroPadron(datosExtraPadrones[padron]?.numero);
+    } else {
+      setNombrePadron('Ciudadano');
+      setNumeroPadron(1);
+    }
   }, [route.params.padronNombre]);
-  useEffect(() => {
-    setNombrePadron('Ciudadano');
-  }, []);
+
+  const checkCorte = () => {
+    if (hasCorte) {
+      showAlert('Ya se encuentra un corte abierto', 'Alerta');
+      navigation.navigate('menu');
+    }
+  };
+
+  const corteIsClosed = () => {
+    const {apertura} = corte;
+    const currentDay = Moment().format('DD');
+    const diaApertura = Moment(apertura, 'YYYY-MM-DD').format('DD');
+    if (diaApertura !== currentDay) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const showAlert = (mensaje, titulo) =>
+    Alert.alert(`${titulo || 'Problema en la busqueda'}`, mensaje, [
+      {
+        text: 'Entendido',
+        style: 'cancel',
+      },
+    ]);
 
   const reduceArrCargos = cargo => {
     const {
@@ -248,73 +286,31 @@ const CargosPadrones = ({route}) => {
     };
   };
 
-  // const getTotalPadron = (cargos, keys) => {
-  //   let ttl = 0;
-  //   if (selectedRowKeys.length === data.length) {
-  //     if (cargos.length) {
-  //       const filtered = cargos.filter(e => keys.includes(e.id));
-  //       ttl = filtered.reduce((accum, curr) => accum + curr.adeudo_total, 0);
-  //     }
-  //   }
-  //   return redondeo ? Math.round(ttl) : ttl;
-  // };
-
-  // const getTotal = () => {
-  //   let ttl = 0;
-  //   if (selectedRowKeys.length === data.length) {
-  //     data.forEach((item, idx) => {
-  //       const keys = [...selectedRowKeys[idx]];
-  //       const cargos = item.cargos.filter(e => keys.includes(e.id));
-  //       ttl += cargos.reduce((accum, curr) => accum + curr.adeudo_total, 0);
-  //     });
-  //   }
-
-  //   return redondeo
-  //     ? Math.round(parseFloat(ttl).toFixed(2))
-  //     : parseFloat(ttl).toFixed(2);
-  // };
-
-  const checkCorte = () => {
-    if (hasCorte) {
-      showAlert('Ya se encuentra un corte abierto', 'Alerta');
-      navigation.navigate('menu');
-    }
-  };
-
-  const showAlert = (mensaje, titulo) =>
-    Alert.alert(`${titulo || 'Problema en la busqueda'}`, mensaje, [
-      {
-        text: 'Entendido',
-        style: 'cancel',
-      },
-    ]);
-
   //Hace el get correspondiente al padron para obtener su informacion dependiendo de la busqueda
-  const handleGetOneData = async (searchData, formData) => {
+  const handleBuscarPadron = async (searchData, formData) => {
+    console.log('nombre padron');
+    console.log(nombrePadron);
     let response;
     let numeroDePadron;
-    if (nombrePadron === 'Ciudadano') {
+    if (nombrePadron === 'Ciudadano' || nombrePadron === 'Caja') {
       response = await getCiudadano(searchData, formData);
-      console.log(response);
       numeroDePadron = 1;
-    } else if (nombrePadron === 'Empresa') {
-      response = await getEmpresa(searchData, formData);
-      numeroDePadron = 2;
     } else if (nombrePadron === 'Predio') {
       response = await getPredio(searchData, formData);
       numeroDePadron = 3;
+      console.log(response);
     } else if (nombrePadron === 'Vehiculo') {
       response = await getVehiculo(searchData, formData);
       numeroDePadron = 4;
+    } else if (nombrePadron === 'Agencia') {
+      response = await getAgencia(searchData, formData);
+      numeroDePadron = 14;
+    } else if (nombrePadron !== undefined) {
+      response = await getEmpresa(searchData, formData, nombrePadron);
+      numeroDePadron = 2;
     }
 
-    console.log('respuesta antes de adeudo [0]');
-
-    if (
-      response === null ||
-      response === undefined ||
-      response[0] === undefined
-    ) {
+    if (!response) {
       showAlert('No se encontró nada que concuerde con la busqueda');
     } else if (response.length > 1) {
       //Hay mas de un dato para poner en caja, hay que elegir cual poner
@@ -323,27 +319,43 @@ const CargosPadrones = ({route}) => {
         data: response,
       });
     } else {
-      console.log(contribuyente === undefined);
-      console.log(nombrePadron === 'Ciudadano');
-      if (contribuyente === undefined && nombrePadron === 'Ciudadano') {
-        console.log('contribuyentes 2');
-        setContribuyente(response);
-      }
-      //Solo hay un dato para poner en caja, procede
-      setPadronId(response[0].id);
-      let result = await getAdeudoPadron(response[0], numeroDePadron);
-      let total = 0;
-      result?.cargos?.map(cargo => {
-        let cargoData = reduceArrCargos(cargo);
-        total += cargoData.adeudo_total;
-      });
-      setResultCargos(result?.cargos);
-      setNewData(true);
-      setNameSearch(response[0][iconsCard[nombrePadron]?.variableDeNombre]);
-      setImporteTotal(Math.round(total));
-      console.log('contribuyente 3');
-      console.log(contribuyente);
+      response = response[0];
+      handleBuscarCargos(response);
     }
+  };
+
+  const handleBuscarCargos = async padronData => {
+    setResultPadrones([...resultPadrones, padronData]);
+    setPadronCorrespondiente([...padronCorrespondiente, nombrePadron]);
+    if (contribuyente === undefined && nombrePadron === 'Ciudadano') {
+      setContribuyente(padronData);
+    }
+
+    let response = await getAdeudoPadron(padronData, numeroPadron);
+    let total = 0;
+    let arrCargos;
+    let allArrCargos = [];
+
+    if (response?.cargos[0] !== undefined) {
+      response?.cargos?.map(cargo => {
+        arrCargos = reduceArrCargos(cargo);
+        allArrCargos.push(arrCargos);
+        total += arrCargos.adeudo_total;
+      });
+      setResultCargos([...resultCargos, response?.cargos]);
+      setResultArrCargos([...resultArrCargos, allArrCargos]);
+    } else {
+      setResultCargos([...resultCargos, undefined]);
+      setResultArrCargos([...resultArrCargos, undefined]);
+    }
+
+    setNameSearch([
+      ...nameSearch,
+      padronData[datosExtraPadrones[nombrePadron]?.variableDeNombre],
+    ]);
+    setImporteTotal(importeTotal + Math.round(total));
+    setNewData(true);
+    setIsLoading(false);
   };
 
   //Maneja la funcion del boton de busqueda
@@ -361,11 +373,12 @@ const CargosPadrones = ({route}) => {
       showAlert('Seleccione un padron primero');
     } else {
       if (formData !== null && formData !== undefined) {
-        await handleGetOneData('', formData);
+        await handleBuscarPadron('', formData);
       } else {
-        await handleGetOneData(searchText, formData);
+        await handleBuscarPadron(searchText, formData);
       }
     }
+    setNewData(true);
     setIsLoading(false);
   };
 
@@ -375,8 +388,7 @@ const CargosPadrones = ({route}) => {
     } else {
       setIsLoading(true);
       setNewData(false);
-      setNombrePadron('Ciudadano');
-      handleGetOneData(searchText, formData);
+      handleBuscarPadron(searchText, formData);
       setIsLoading(false);
     }
   };
@@ -386,45 +398,56 @@ const CargosPadrones = ({route}) => {
   const calcular = async () => {
     setIsLoading(true);
     if (hasCorte) {
-      if (importeTotal !== 0) {
-        let paymentResponse = await NativeModules.RNNetPay.doTrans(
-          importeTotal.toFixed(2),
-        );
-        if (paymentResponse.success === true) {
-          console.log('payment');
-          console.log(paymentResponse.success === true);
-          let recibos = await getRecibos(
-            padronId,
-            [{metodo: 1, importe: importeTotal}],
-            [
-              {
-                cargos: resultCargos?.map(cargo => {
-                  return cargo.id;
-                }),
-                padron_id: padronId,
-                tipo_de_padron: numeroPadron,
-              },
-            ],
+      if (corteIsClosed) {
+        if (importeTotal !== 0) {
+          let paymentResponse = await NativeModules.RNNetPay.doTrans(
+            importeTotal.toFixed(2),
           );
-          console.log(recibos);
-          console.log(recibos.recibos);
-          navigation.navigate('recibos-de-caja', {recibos});
+          console.log('payment');
+          console.log(paymentResponse);
+          console.log(paymentResponse.success === true);
+          if (paymentResponse.success === true) {
+            showAlert('Pago Realizado con Exito', 'Pago Completado');
+            let recibos = await getRecibos(
+              contribuyente?.id,
+              [{metodo: 1, importe: importeTotal}],
+              resultCargos?.flatMap((cargo, index) =>
+                cargo !== undefined
+                  ? {
+                      cargos: cargo?.map(cargo => {
+                        return cargo.id;
+                      }),
+                      padron_id: resultPadrones[index].id,
+                      tipo_de_padron:
+                        datosExtraPadrones[padronCorrespondiente?.[index]]
+                          .numero,
+                    }
+                  : [],
+              ),
+            );
+
+            navigation.navigate('recibos-de-caja', {recibos});
+          } else {
+            showAlert(
+              paymentResponse.message || 'Problema en la transaccion',
+              'Error en el pago',
+            );
+          }
         } else {
-          showAlert('Error en el pago', 'Problema en la transaccion');
+          showAlert('Cantidad Invalida', 'Problema en la transacción');
         }
       } else {
-        showAlert('Cantidad Invalida', 'Problema en la transacción');
+        showAlert('Hay un Corte sin Cerrar', 'No se puede proceder');
       }
     } else {
       showAlert('Se requiere un corte abierto', 'No se puede proceder');
     }
-
     setIsLoading(false);
   };
 
   const handleObligacionesPdf = async () => {
     setLoadingObligaciones(true);
-    const response = await imprimirObligaciones(contribuyente?.[0].id, 1);
+    const response = await imprimirObligaciones(contribuyente?.id, 1);
     setLoadingObligaciones(false);
     if (response) {
       navigation.navigate('preview-pdf', {base64: response});
@@ -433,7 +456,7 @@ const CargosPadrones = ({route}) => {
 
   const handleSituacionPdf = async () => {
     setLoadingSituacion(true);
-    const response = await imprimirConstancia(contribuyente?.[0].id);
+    const response = await imprimirConstancia(contribuyente?.id);
     setLoadingSituacion(false);
     if (response) {
       navigation.navigate('preview-pdf', {base64: response});
@@ -497,38 +520,56 @@ const CargosPadrones = ({route}) => {
           <LabelContribuyente>Buscar Contribuyente</LabelContribuyente>
         )}
         <Linepx />
-        <ScrollView>
-          {newData === true ? (
-            <DropdownButton
-              padron={nombrePadron}
-              nombre={nameSearch}
-              cargo={importeTotal}
-              children={resultCargos?.map((cargo, index) => {
-                var dataCargo = reduceArrCargos(cargo);
-                return (
-                  <CardItem
-                    key={index}
-                    info={cargo.descripcion + ' $' + dataCargo?.adeudo_total}
-                    cargo={cargo}
-                    reduceCargo={reduceArrCargos(cargo)}
-                    navegar="detallesPadron"
-                  />
-                );
-              })}
-            />
-          ) : null}
+        {newData === true ? (
+          <FlatList
+            data={resultPadrones}
+            keyExtractor={item => item?.id}
+            contentContainerStyle={{
+              flexGrow: 1,
+              alignItems: 'center',
+            }}
+            renderItem={({item, index}) => {
+              console.log('result tt');
+              console.log(resultPadrones);
+              return (
+                <DropdownButton
+                  nombre={
+                    item?.[
+                      datosExtraPadrones[padronCorrespondiente[index]]
+                        ?.variableDeNombre
+                    ]
+                  }
+                  padron={padronCorrespondiente[index]}
+                  cargo={resultArrCargos[index]?.reduce(
+                    (accum, curr) => accum + curr.adeudo_total,
+                    0,
+                  )}
+                  children={resultCargos[index]?.map((cargo, index) => {
+                    var arrCargo = reduceArrCargos(cargo);
+                    return (
+                      <CardItem
+                        key={index}
+                        info={cargo.descripcion}
+                        cargo={cargo}
+                        reduceCargo={arrCargo}
+                        navegar="detallesPadron"
+                      />
+                    );
+                  })}
+                />
+              );
+            }}
+          />
+        ) : null}
 
-          {isLoading ? (
-            <ActivityIndicator size="large" color="#fc9696" />
-          ) : null}
-        </ScrollView>
+        {isLoading ? <ActivityIndicator size="large" color="#fc9696" /> : null}
       </MenuContainer>
       <Footer>
         <LabelContainer>
           <TotalLabel>Total</TotalLabel>
           <ValueLabel>${importeTotal}</ValueLabel>
         </LabelContainer>
-        {padronId ? (
+        {contribuyente?.id ? (
           <Button
             loading={loadingObligaciones}
             text="Imprimir Opinión de Obligaciones"
@@ -538,7 +579,7 @@ const CargosPadrones = ({route}) => {
             }}
           />
         ) : null}
-        {padronId ? (
+        {contribuyente?.id ? (
           <Button
             loading={loadingSituacion}
             text="Imprimir Situación"

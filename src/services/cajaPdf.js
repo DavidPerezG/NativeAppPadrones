@@ -37,6 +37,8 @@ const imprimirConstancia = async padron_id => {
 };
 
 const getRecibos = async (ciudadano, metodos_de_pago, padrones) => {
+  console.log('padrones');
+  console.log(padrones);
   let result;
   let body = {
     ciudadano: ciudadano,
@@ -56,10 +58,11 @@ const getRecibos = async (ciudadano, metodos_de_pago, padrones) => {
 };
 
 const getBase64Recibos = async id => {
+  console.log(id);
   let base64;
   try {
     const res = await http.post('/recaudacion/recibo/pdfs/', {
-      recibos_id: [id],
+      recibos_id: id,
     });
     if (res?.status === 200) {
       base64 = `data:application/pdf;base64,${res.data.data}`;
@@ -76,7 +79,7 @@ const getBase64Ticket = async id => {
   let base64;
   try {
     const res = await http.post('/recaudacion/recibo-ticket/pdfs/', {
-      recibos_id: [id],
+      recibos_id: id,
     });
     if (res?.status === 200) {
       base64 = `data:application/pdf;base64,${res.data.data}`;
