@@ -55,7 +55,7 @@ const datosExtraPadrones = {
   Cedular: {numero: 10, variableDeNombre: 'razon_social'},
   'Juego-de-Azar': {numero: 11, variableDeNombre: 'razon_social'},
   Notario: {numero: 12, variableDeNombre: 'razon_social'},
-  'Casa-de-empenio': {numero: 13, variableDeNombre: 'razon_social'},
+  'Casa-de-impenio': {numero: 13, variableDeNombre: 'razon_social'},
   Agencia: {numero: 14, variableDeNombre: 'razon_social'},
 };
 
@@ -70,8 +70,9 @@ const CargosPadrones = ({route}) => {
   const [contribuyente, setContribuyente] = useState();
   const [importeTotal, setImporteTotal] = useState(0);
 
-  const [nombrePadron, setNombrePadron] = useState();
-  const [numeroPadron, setNumeroPadron] = useState();
+  const [nombrePadronBack, setNombrePadronBack] = useState();
+  const [nombrePadronFront, setNombrePadronFront] = useState(String());
+  const [numeroPadron, setNumeroPadron] = useState(Number());
 
   const [newData, setNewData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -91,24 +92,30 @@ const CargosPadrones = ({route}) => {
   useEffect(() => {
     console.log('corriendo useEffect');
     let padron = route.params.padronNombre;
-
-    if (padron === 'Juego de Azar') {
-      setNombrePadron('Juego-de-azar');
+    if (!padron) {
+      padron = nombrePadronFront;
+    }
+    padron = padron?.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (padron === 'Juego De Azar') {
+      setNombrePadronBack('Juego-de-azar');
+      setNombrePadronFront('Juego De Azar');
       padron = 'Juego-de-azar';
-    }
-    if (padron === 'Casa De Empeño') {
-      setNombrePadron('Casa-de-empenio');
-      padron = 'Casa-de-empenio';
+    } else if (padron.trim() === 'Casa De Empeno') {
+      setNombrePadronBack('Casa-de-impenio');
+      setNombrePadronFront('Casa De Empeño');
+      padron = 'Casa-de-impenio';
     } else {
-      setNombrePadron(padron);
+      setNombrePadronFront(padron);
+      setNombrePadronBack(padron);
     }
-
     if (datosExtraPadrones.hasOwnProperty(padron)) {
       setNumeroPadron(datosExtraPadrones[padron]?.numero);
     } else {
-      setNombrePadron('Ciudadano');
+      setNombrePadronFront('Ciudadano');
+      setNombrePadronBack('Ciudadano');
       setNumeroPadron(1);
     }
+    console.log(padron);
   }, [route.params.padronNombre]);
 
   const checkCorte = () => {
@@ -289,45 +296,51 @@ const CargosPadrones = ({route}) => {
   //Hace el get correspondiente al padron para obtener su informacion dependiendo de la busqueda
   const handleBuscarPadron = async (searchData, formData) => {
     console.log('nombre padron');
-    console.log(nombrePadron);
+    console.log(nombrePadronFront);
     let response;
     let numeroDePadron;
-    if (nombrePadron === 'Ciudadano' || nombrePadron === 'Caja') {
+    if (nombrePadronFront === 'Ciudadano' || nombrePadronFront === 'Caja') {
       response = await getCiudadano(searchData, formData);
       numeroDePadron = 1;
-    } else if (nombrePadron === 'Predio') {
+    } else if (nombrePadronFront === 'Predio') {
       response = await getPredio(searchData, formData);
       numeroDePadron = 3;
       console.log(response);
-    } else if (nombrePadron === 'Vehiculo') {
+    } else if (nombrePadronFront === 'Vehiculo') {
       response = await getVehiculo(searchData, formData);
       numeroDePadron = 4;
-    } else if (nombrePadron === 'Agencia') {
+    } else if (nombrePadronFront === 'Agencia') {
       response = await getAgencia(searchData, formData);
       numeroDePadron = 14;
-    } else if (nombrePadron !== undefined) {
-      response = await getEmpresa(searchData, formData, nombrePadron);
+    } else if (nombrePadronFront !== undefined) {
+      response = await getEmpresa(searchData, formData, nombrePadronBack);
       numeroDePadron = 2;
     }
 
-    if (!response) {
+    console.log('response response');
+    console.log(response);
+    if (!response || response[0] === undefined) {
       showAlert('No se encontró nada que concuerde con la busqueda');
     } else if (response.length > 1) {
       //Hay mas de un dato para poner en caja, hay que elegir cual poner
       navigation.navigate('tabla-seleccion', {
-        nombrePadron: nombrePadron,
+        nombrePadron: nombrePadronFront,
         data: response,
       });
     } else {
       response = response[0];
-      handleBuscarCargos(response);
+      if (resultPadrones.includes(padron => padron.id === response.id)) {
+        showAlert('Ya se encuentra en resultados');
+      } else {
+        handleBuscarCargos(response);
+      }
     }
   };
 
   const handleBuscarCargos = async padronData => {
     setResultPadrones([...resultPadrones, padronData]);
-    setPadronCorrespondiente([...padronCorrespondiente, nombrePadron]);
-    if (contribuyente === undefined && nombrePadron === 'Ciudadano') {
+    setPadronCorrespondiente([...padronCorrespondiente, nombrePadronFront]);
+    if (contribuyente === undefined && nombrePadronFront === 'Ciudadano') {
       setContribuyente(padronData);
     }
 
@@ -351,7 +364,7 @@ const CargosPadrones = ({route}) => {
 
     setNameSearch([
       ...nameSearch,
-      padronData[datosExtraPadrones[nombrePadron]?.variableDeNombre],
+      padronData[datosExtraPadrones[nombrePadronBack]?.variableDeNombre],
     ]);
     setImporteTotal(importeTotal + Math.round(total));
     setNewData(true);
@@ -366,9 +379,9 @@ const CargosPadrones = ({route}) => {
     if ((searchText === null || searchText === '') && formData === undefined) {
       showAlert('Escriba algo en la busqueda');
     } else if (
-      nombrePadron === 'Caja' ||
-      nombrePadron === null ||
-      nombrePadron === undefined
+      nombrePadronFront === 'Caja' ||
+      nombrePadronFront === null ||
+      nombrePadronFront === undefined
     ) {
       showAlert('Seleccione un padron primero');
     } else {
@@ -479,6 +492,7 @@ const CargosPadrones = ({route}) => {
             onChangeText={text => setSearchText(text)}
           />
           <TouchableWithoutFeedback
+            disabled={isLoading}
             onPress={() => {
               console.log(contribuyente);
               contribuyente === undefined

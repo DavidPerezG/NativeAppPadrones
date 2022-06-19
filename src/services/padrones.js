@@ -124,6 +124,8 @@ const getPredio = async (search, advanceSearch) => {
 };
 
 const getEmpresa = async (search, advanceSearch, nombrePadron) => {
+  console.log('nombre padron');
+  console.log(nombrePadron.toLowerCase());
   let urlEndpoint = 'empresas/' + nombrePadron.toLowerCase() + '-caja/';
   let result;
   await http

@@ -16,9 +16,9 @@ const nameVarPadron = {
   Nomina: 'razon_social',
   Alcohol: 'razon_social',
   Cedular: 'razon_social',
-  'Juego-de-azar': 'razon_social',
+  'Juego De Azar': 'razon_social',
   Notario: 'razon_social',
-  'Casa-de-empenio': 'razon_social',
+  'Casa De Empeño': 'razon_social',
   Agencia: 'razon_social',
 };
 

@@ -33,7 +33,7 @@ const DropdownButton = ({padron, nombre, cargo, children}) => {
                 ? `${nombre}`
                 : `${nombre?.substring(0, 32)}...`}
             </Text>
-            <Text style={styles.text}>${cargo}</Text>
+            <Text style={styles.text}>${cargo || 0.0}</Text>
           </View>
         </View>
       </TouchableWithoutFeedback>

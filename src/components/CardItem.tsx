@@ -23,7 +23,7 @@ const CardItem = ({
         navigation.navigate(navegar, {
           selectType: selectType,
           data: data,
-          nombrePadron: padron,
+          padronNombre: padron,
           cargo: cargo,
         })
       }>
