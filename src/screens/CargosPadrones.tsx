@@ -52,10 +52,10 @@ const datosExtraPadrones = {
   Arrendamiento: {numero: 7, variableDeNombre: 'razon_social'},
   Nomina: {numero: 8, variableDeNombre: 'razon_social'},
   Alcohol: {numero: 9, variableDeNombre: 'razon_social'},
-  Cedular: {numero: 10, variableDeNombre: 'razon_social'},
-  'Juego-de-Azar': {numero: 11, variableDeNombre: 'razon_social'},
+  cedular: {numero: 10, variableDeNombre: 'razon_social'},
+  'Juego De Azar': {numero: 11, variableDeNombre: 'razon_social'},
   Notario: {numero: 12, variableDeNombre: 'razon_social'},
-  'Casa-de-impenio': {numero: 13, variableDeNombre: 'razon_social'},
+  'Casa De Empeño ': {numero: 13, variableDeNombre: 'razon_social'},
   Agencia: {numero: 14, variableDeNombre: 'razon_social'},
 };
 
@@ -70,8 +70,7 @@ const CargosPadrones = ({route}) => {
   const [contribuyente, setContribuyente] = useState();
   const [importeTotal, setImporteTotal] = useState(0);
 
-  const [nombrePadronBack, setNombrePadronBack] = useState();
-  const [nombrePadronFront, setNombrePadronFront] = useState(String());
+  const [nombrePadron, setNombrePadron] = useState(String());
   const [numeroPadron, setNumeroPadron] = useState(Number());
 
   const [newData, setNewData] = useState(false);
@@ -91,32 +90,26 @@ const CargosPadrones = ({route}) => {
 
   useEffect(() => {
     console.log('corriendo useEffect');
+
     let padron = route.params.padronNombre;
-    if (!padron) {
-      padron = nombrePadronFront;
-    }
-    padron = padron?.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    if (padron === 'Juego De Azar') {
-      setNombrePadronBack('Juego-de-azar');
-      setNombrePadronFront('Juego De Azar');
-      padron = 'Juego-de-azar';
-    } else if (padron.trim() === 'Casa De Empeno') {
-      setNombrePadronBack('Casa-de-impenio');
-      setNombrePadronFront('Casa De Empeño');
-      padron = 'Casa-de-impenio';
-    } else {
-      setNombrePadronFront(padron);
-      setNombrePadronBack(padron);
-    }
+
     if (datosExtraPadrones.hasOwnProperty(padron)) {
+      setNombrePadron(padron);
       setNumeroPadron(datosExtraPadrones[padron]?.numero);
     } else {
-      setNombrePadronFront('Ciudadano');
-      setNombrePadronBack('Ciudadano');
+      setNombrePadron('Ciudadano');
       setNumeroPadron(1);
     }
-    console.log(padron);
   }, [route.params.padronNombre]);
+
+  const checkRepeatedPadron = padronToCheck => {
+    for (var key in resultPadrones) {
+      if (resultPadrones[key].id === padronToCheck.id) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const checkCorte = () => {
     if (hasCorte) {
@@ -295,79 +288,71 @@ const CargosPadrones = ({route}) => {
 
   //Hace el get correspondiente al padron para obtener su informacion dependiendo de la busqueda
   const handleBuscarPadron = async (searchData, formData) => {
-    console.log('nombre padron');
-    console.log(nombrePadronFront);
     let response;
-    let numeroDePadron;
-    if (nombrePadronFront === 'Ciudadano' || nombrePadronFront === 'Caja') {
+    if (nombrePadron === 'Ciudadano' || nombrePadron === 'Caja') {
       response = await getCiudadano(searchData, formData);
-      numeroDePadron = 1;
-    } else if (nombrePadronFront === 'Predio') {
+    } else if (nombrePadron === 'Predio') {
       response = await getPredio(searchData, formData);
-      numeroDePadron = 3;
-      console.log(response);
-    } else if (nombrePadronFront === 'Vehiculo') {
+    } else if (nombrePadron === 'Vehiculo') {
       response = await getVehiculo(searchData, formData);
-      numeroDePadron = 4;
-    } else if (nombrePadronFront === 'Agencia') {
+    } else if (nombrePadron === 'Agencia') {
       response = await getAgencia(searchData, formData);
-      numeroDePadron = 14;
-    } else if (nombrePadronFront !== undefined) {
-      response = await getEmpresa(searchData, formData, nombrePadronBack);
-      numeroDePadron = 2;
+    } else if (nombrePadron !== undefined) {
+      response = await getEmpresa(searchData, formData, nombrePadron);
     }
 
-    console.log('response response');
-    console.log(response);
     if (!response || response[0] === undefined) {
       showAlert('No se encontró nada que concuerde con la busqueda');
     } else if (response.length > 1) {
       //Hay mas de un dato para poner en caja, hay que elegir cual poner
       navigation.navigate('tabla-seleccion', {
-        nombrePadron: nombrePadronFront,
+        nombrePadron: nombrePadron,
         data: response,
       });
     } else {
       response = response[0];
-      if (resultPadrones.includes(padron => padron.id === response.id)) {
-        showAlert('Ya se encuentra en resultados');
-      } else {
-        handleBuscarCargos(response);
-      }
+      handleBuscarCargos(response);
     }
   };
 
   const handleBuscarCargos = async padronData => {
-    setResultPadrones([...resultPadrones, padronData]);
-    setPadronCorrespondiente([...padronCorrespondiente, nombrePadronFront]);
-    if (contribuyente === undefined && nombrePadronFront === 'Ciudadano') {
-      setContribuyente(padronData);
-    }
+    console.log('handleBuscarCargo');
 
-    let response = await getAdeudoPadron(padronData, numeroPadron);
-    let total = 0;
-    let arrCargos;
-    let allArrCargos = [];
-
-    if (response?.cargos[0] !== undefined) {
-      response?.cargos?.map(cargo => {
-        arrCargos = reduceArrCargos(cargo);
-        allArrCargos.push(arrCargos);
-        total += arrCargos.adeudo_total;
-      });
-      setResultCargos([...resultCargos, response?.cargos]);
-      setResultArrCargos([...resultArrCargos, allArrCargos]);
+    if (checkRepeatedPadron(padronData)) {
+      showAlert('Padron ya en la lista encontrada');
     } else {
-      setResultCargos([...resultCargos, undefined]);
-      setResultArrCargos([...resultArrCargos, undefined]);
+      setResultPadrones([...resultPadrones, padronData]);
+      setPadronCorrespondiente([...padronCorrespondiente, nombrePadron]);
+      if (contribuyente === undefined && nombrePadron === 'Ciudadano') {
+        setContribuyente(padronData);
+      }
+
+      let response = await getAdeudoPadron(padronData, numeroPadron);
+      let total = 0;
+      let arrCargos;
+      let allArrCargos = [];
+
+      if (response?.cargos[0] !== undefined) {
+        response?.cargos?.map(cargo => {
+          arrCargos = reduceArrCargos(cargo);
+          allArrCargos.push(arrCargos);
+          total += arrCargos.adeudo_total;
+        });
+        setResultCargos([...resultCargos, response?.cargos]);
+        setResultArrCargos([...resultArrCargos, allArrCargos]);
+      } else {
+        setResultCargos([...resultCargos, undefined]);
+        setResultArrCargos([...resultArrCargos, undefined]);
+      }
+
+      setNameSearch([
+        ...nameSearch,
+        padronData[datosExtraPadrones[nombrePadron]?.variableDeNombre],
+      ]);
+      setImporteTotal(importeTotal + Math.round(total));
+      setNewData(true);
     }
 
-    setNameSearch([
-      ...nameSearch,
-      padronData[datosExtraPadrones[nombrePadronBack]?.variableDeNombre],
-    ]);
-    setImporteTotal(importeTotal + Math.round(total));
-    setNewData(true);
     setIsLoading(false);
   };
 
@@ -379,9 +364,9 @@ const CargosPadrones = ({route}) => {
     if ((searchText === null || searchText === '') && formData === undefined) {
       showAlert('Escriba algo en la busqueda');
     } else if (
-      nombrePadronFront === 'Caja' ||
-      nombrePadronFront === null ||
-      nombrePadronFront === undefined
+      nombrePadron === 'Caja' ||
+      nombrePadron === null ||
+      nombrePadron === undefined
     ) {
       showAlert('Seleccione un padron primero');
     } else {
@@ -416,9 +401,6 @@ const CargosPadrones = ({route}) => {
           let paymentResponse = await NativeModules.RNNetPay.doTrans(
             importeTotal.toFixed(2),
           );
-          console.log('payment');
-          console.log(paymentResponse);
-          console.log(paymentResponse.success === true);
           if (paymentResponse.success === true) {
             showAlert('Pago Realizado con Exito', 'Pago Completado');
             let recibos = await getRecibos(
@@ -543,8 +525,6 @@ const CargosPadrones = ({route}) => {
               alignItems: 'center',
             }}
             renderItem={({item, index}) => {
-              console.log('result tt');
-              console.log(resultPadrones);
               return (
                 <DropdownButton
                   nombre={

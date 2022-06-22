@@ -47,7 +47,6 @@ const getAdeudoCiudadano = async ciudadano => {
   if (ciudadano !== undefined && ciudadano !== null) {
     await http.get(`recaudacion/consulta-caja/${ciudadano?.id}`).then(
       response => {
-        console.log(response);
         result = response?.data[0];
       },
       error => {
@@ -124,8 +123,12 @@ const getPredio = async (search, advanceSearch) => {
 };
 
 const getEmpresa = async (search, advanceSearch, nombrePadron) => {
-  console.log('nombre padron');
-  console.log(nombrePadron.toLowerCase());
+  nombrePadron = nombrePadron.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (nombrePadron === 'Juego De Azar') {
+    nombrePadron = 'Juego-de-azar';
+  } else if (nombrePadron.trim() === 'Casa De Empeno') {
+    nombrePadron = 'Casa-de-impenio';
+  }
   let urlEndpoint = 'empresas/' + nombrePadron.toLowerCase() + '-caja/';
   let result;
   await http
