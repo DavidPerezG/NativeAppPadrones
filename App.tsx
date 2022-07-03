@@ -25,6 +25,10 @@ import TablaSeleccion from './src/screens/TablaSeleccion';
 import DetallesSeleccion from './src/screens/DetallesSeleccion';
 import RecibosDeCaja from './src/screens/RecibosDeCaja';
 import PreviewPDF from './src/screens/PreviewPDF';
+import ListadoPadrones from './src/screens/ListadoPadrones';
+import AgenciasSearch from './src/screens/padrones/AgenciasSearch';
+
+import DropdownalertProvider from './src/components/DropdownalertProvider';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -52,16 +56,20 @@ const AppContainer = () => (
       <Stack.Screen name="detalles-seleccion" component={DetallesSeleccion} />
       <Stack.Screen name="recibos-de-caja" component={RecibosDeCaja} />
       <Stack.Screen name="preview-pdf" component={PreviewPDF} />
+      <Stack.Screen name="listado-padrones" component={ListadoPadrones} />
+      <Stack.Screen name="agencias-search" component={AgenciasSearch} />
     </Stack.Navigator>
   </NavigationContainer>
 );
 
 export default () => {
   return (
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <AppContainer />
-      </PersistGate>
-    </Provider>
+    <DropdownalertProvider>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <AppContainer />
+        </PersistGate>
+      </Provider>
+    </DropdownalertProvider>
   );
 };

@@ -3,6 +3,10 @@ export type RootStackParamList = {
   menu: undefined;
   login: undefined;
   caja: undefined;
+  profile: undefined;
+  cargosPadrones: undefined;
+  detallesPadron: undefined;
+  'detalle-de-corte': undefined;
   'abrir-corte': undefined;
   'busqueda-padron': undefined;
   'busqueda-avanzada-ciudadano': undefined;
@@ -13,7 +17,6 @@ export type RootStackParamList = {
   'detalles-seleccion': undefined;
   'recibos-de-caja': undefined;
   'preview-pdf': undefined;
+  'listado-padrones': undefined;
+  'agencias-search': undefined;
 };
-
-export type {RootStackParamList};
-profile: undefined;

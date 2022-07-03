@@ -9,7 +9,13 @@ import {
 import Collapsible from 'react-native-collapsible';
 import fonts from '../utils/fonts';
 
-const DropdownButton = ({padron, nombre, cargo, children}) => {
+interface IDropDownButton {
+  leftText?: string;
+  rightText?: string;
+  children?: JSX.Element;
+}
+
+const DropdownButton = ({leftText, rightText, children}: IDropDownButton) => {
   const [isCollapsable, setIsCollapsable] = useState(true);
 
   useEffect(() => {}, []);
@@ -28,12 +34,11 @@ const DropdownButton = ({padron, nombre, cargo, children}) => {
         <View style={styles.card}>
           <View style={styles.row}>
             <Text numberOfLines={1} style={styles.text}>
-              {padron}:
-              {nombre?.length < 35
-                ? `${nombre}`
-                : `${nombre?.substring(0, 32)}...`}
+              {leftText?.length < 40
+                ? `${leftText}`
+                : `${leftText?.substring(0, 37)}...`}
             </Text>
-            <Text style={styles.text}>${cargo || 0.0}</Text>
+            <Text style={styles.text}>{rightText}</Text>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -57,7 +62,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     elevation: 3,
-    marginVertical: 3,
+    marginBottom: 6,
   },
   childrenCard: {
     width: Dimensions.get('window').width * 0.85,

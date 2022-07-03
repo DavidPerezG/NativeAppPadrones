@@ -79,8 +79,6 @@ const AbrirCorteScreen = () => {
 
     // @ts-ignore
     const response = await abrirCorte(total, unidadDeRecaudacion.id);
-    console.log('corte');
-    console.log(response);
     if (!response.response === null) {
       dispatchSetCorte(dispatch, response);
       navigation.reset({

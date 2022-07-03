@@ -7,8 +7,6 @@ const login = async (email, password) => {
       email,
       password,
     });
-    console.log('La respuesta de login');
-    console.log(response?.data);
     return response?.data?.access ? response?.data : null;
   } catch (error) {
     console.error(error, error?.response?.data);

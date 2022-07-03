@@ -69,7 +69,6 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
       ...form,
       [name]: text,
     });
-    console.log('sucede');
   };
 
   const handleSearch = async () => {
@@ -83,7 +82,6 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
     opened[index] === true
       ? (arrayOpen[index] = false)
       : (arrayOpen[index] = true);
-    console.log(arrayOpen);
     setOpened(arrayOpen);
   };
 

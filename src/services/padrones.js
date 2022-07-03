@@ -43,7 +43,6 @@ const getCiudadano = async (search, advanceSearch) => {
 
 const getAdeudoCiudadano = async ciudadano => {
   let result;
-  console.log(ciudadano.id);
   if (ciudadano !== undefined && ciudadano !== null) {
     await http.get(`recaudacion/consulta-caja/${ciudadano?.id}`).then(
       response => {
@@ -157,7 +156,7 @@ const getEmpresa = async (search, advanceSearch, nombrePadron) => {
   return result;
 };
 
-const getAgencia = async (search, advanceSearch) => {
+const getAgencia = async (search, advanceSearch, page) => {
   let urlEndpoint = 'empresas/agencia-caja/';
   let result;
   await http
@@ -172,6 +171,7 @@ const getAgencia = async (search, advanceSearch) => {
         domicilio_fiscal__codigo_postal: advanceSearch?.codigo_postal,
         domicilio_fiscal_calle_principal: advanceSearch?.calle_principal,
         domicilio_fiscal__numero_exterior: advanceSearch?.numero_exterior,
+        page: page,
       },
     })
     .then(

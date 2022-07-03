@@ -83,8 +83,6 @@ const DetalleDeCorteScreen = () => {
       },
     ];
 
-    console.log(corte);
-
     const isClosed = await cerrarCorte(corte.id, paymentMethods);
     if (isClosed) {
       dispatchSetCorte(dispatch, null);

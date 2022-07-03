@@ -14,7 +14,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import fonts from '../../utils/fonts';
 
-const BusquedaAvanzadaEmpresa = ({cargos, onSearch}) => {
+const BusquedaAvanzadaEmpresa = ({onSearch}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [metodo, setMetodo] = useState();
   const [importe, setImporte] = useState(0.0);
@@ -47,7 +47,6 @@ const BusquedaAvanzadaEmpresa = ({cargos, onSearch}) => {
       ...form,
       [name]: text,
     });
-    console.log('sucede');
   };
 
   const handleSearch = async () => {

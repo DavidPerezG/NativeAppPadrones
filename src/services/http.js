@@ -24,7 +24,6 @@ export const HTTP = axios.create(httpConfig);
 // Interceptors
 const onSendRequest = config => {
   const token = store.getState()?.auth?.access;
-  console.log(token);
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

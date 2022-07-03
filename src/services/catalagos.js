@@ -3,7 +3,6 @@ import {HTTP} from './http';
 const getPadrones = async () => {
   try {
     const response = await HTTP.get('catalogos/content-types-padrones/');
-    console.log(response);
 
     if (response?.data && Array.isArray(response.data)) {
       return response.data;

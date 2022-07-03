@@ -26,9 +26,10 @@ const TablaSeleccion = ({route}) => {
   const [data, setData] = useState([]);
   const [nombrePadron, setNombrePadron] = useState();
 
+  const navigation = useNavigation();
+
   useEffect(() => {
     setData(route.params.data);
-    console.log(data[0]);
     setNombrePadron(route.params.nombrePadron);
     listData();
   }, []);
@@ -37,7 +38,11 @@ const TablaSeleccion = ({route}) => {
 
   return (
     <Container>
-      <Header title="Seleccionar Opción" isGoBack />
+      <Header
+        title="Seleccionar Opción"
+        isGoBack
+        onPressLeftButton={() => navigation.goBack()}
+      />
       <TextTitle>{nombrePadron}</TextTitle>
       <MenuContainer>
         <FlatList

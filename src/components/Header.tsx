@@ -15,6 +15,7 @@ interface IHeaderProps {
   isGoBack?: boolean;
   onPressLeftButton?: () => void;
   disableLeftButton?: boolean;
+  noLeftButton?: boolean;
 }
 
 const Header = ({
@@ -22,27 +23,29 @@ const Header = ({
   isGoBack,
   onPressLeftButton,
   disableLeftButton,
+  noLeftButton,
 }: IHeaderProps) => {
   return (
     <View style={styles.header}>
-      <TouchableWithoutFeedback
-        onPress={onPressLeftButton}
-        disabled={disableLeftButton}>
-        <View style={styles.logoContainer}>
-          <Icon
-            style={styles.navIcon}
-            name={!isGoBack ? 'bars' : 'chevron-left'}
-            size={!isGoBack ? 30 : 25}
-            color="white"
-          />
-        </View>
-      </TouchableWithoutFeedback>
+      {!noLeftButton ? (
+        <TouchableWithoutFeedback
+          onPress={onPressLeftButton}
+          disabled={disableLeftButton}>
+          <View style={styles.logoContainer}>
+            <Icon
+              style={styles.navIcon}
+              name={!isGoBack ? 'bars' : 'chevron-left'}
+              size={!isGoBack ? 30 : 25}
+              color="white"
+            />
+          </View>
+        </TouchableWithoutFeedback>
+      ) : null}
 
       <View style={styles.textContainer}>
         <Text style={styles.tituloHeader}>{title}</Text>
       </View>
-      <TouchableWithoutFeedback
-        onPress={() => console.log('hola me presionaste aaa')}>
+      <TouchableWithoutFeedback>
         <View style={styles.logoContainer}>
           <Image
             style={styles.notifContainer}

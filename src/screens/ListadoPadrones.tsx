@@ -9,23 +9,23 @@ import MenuCard from '../components/MenuCard';
 
 import {Padron} from '../types/padronInterface';
 
-const iconsCard = {
-  Ciudadano: 'users',
-  Predio: 'home',
-  Empresa: 'store-alt',
-  Vehiculo: 'car',
-  Alcohol: 'cocktail',
-  Hospedaje: 'suitcase-rolling',
-  Arrendamiento: 'laptop-house',
-  Notario: 'handshake',
-  Nomina: 'hand-holding-usd',
-  cedular: 'user-tag',
-  Agencia: 'hotel',
-  'Casa De Empeño ': 'funnel-dollar',
-  'Juego De Azar': 'dice',
+const padronParams = {
+  Ciudadano: {icon_name: 'users', nav_page: ''},
+  Predio: {icon_name: 'home', nav_page: ''},
+  Empresa: {icon_name: 'store-alt', nav_page: ''},
+  Vehiculo: {icon_name: 'car', nav_page: ''},
+  Alcohol: {icon_name: 'cocktail', nav_page: ''},
+  Hospedaje: {icon_name: 'suitcase-rolling', nav_page: ''},
+  Arrendamiento: {icon_name: 'laptop-house', nav_page: ''},
+  Notario: {icon_name: 'handshake', nav_page: ''},
+  Nomina: {icon_name: 'hand-holding-usd', nav_page: ''},
+  cedular: {icon_name: 'user-tag', nav_page: ''},
+  Agencia: {icon_name: 'hotel', nav_page: 'agencias-search'},
+  'Casa De Empeño ': {icon_name: 'funnel-dollar', nav_page: ''},
+  'Juego De Azar': {icon_name: 'dice', nav_page: ''},
 };
 
-const Caja = () => {
+const ListadoPadrones = () => {
   const [padrones, setPadrones] = useState<Array<Padron>>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -39,7 +39,7 @@ const Caja = () => {
   };
 
   const goBack = () => {
-    navigation.state.params.onSelect({selected: true});
+    navigation.goBack();
   };
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const Caja = () => {
       <Header
         title="Elegir Padron"
         isGoBack
-        onPressLeftButton={() => navigation.goBack()}
+        onPressLeftButton={() => goBack()}
       />
       {isLoading ? <ActivityIndicator size={'large'} color="#235161" /> : null}
       <FlatList
@@ -59,15 +59,15 @@ const Caja = () => {
         renderItem={({item}) => (
           <MenuCard
             nombreItem={item.model}
-            iconName={iconsCard[item.model]}
+            iconName={padronParams[item.model].icon_name}
             color="#3F3F3F"
-            navPage="cargosPadrones"
+            navPage={padronParams[item.model].nav_page}
             handleClick={false}
             navProps={navigation}
-            onPress={() => goBack()}
+            onPress={() => console.log('pressed')}
           />
         )}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()}
         numColumns={3}
         contentContainerStyle={{flexGrow: 1, paddingHorizontal: 5}}
       />
@@ -81,4 +81,4 @@ const Container = styled.View`
   align-items: center;
 `;
 
-export default Caja;
+export default ListadoPadrones;

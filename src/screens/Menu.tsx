@@ -23,39 +23,45 @@ const Menu = () => {
         <MenuCard
           nombreItem="Caja"
           iconName="cash-register"
-          col="#3F3F3F"
+          color="#3F3F3F"
           navPage="cargosPadrones"
         />
 
         <MenuCard
           nombreItem="Abrir Corte"
           iconName="coins"
-          col={!hasCorte ? activeColor : disableColor}
+          color={!hasCorte ? activeColor : disableColor}
           navPage={!hasCorte ? 'abrir-corte' : undefined}
         />
 
         <MenuCard
           nombreItem="Cerrar Corte"
           iconName="window-close"
-          col={hasCorte ? activeColor : disableColor}
+          color={hasCorte ? activeColor : disableColor}
           navPage={hasCorte ? 'detalle-de-corte' : undefined}
         />
       </View>
       <View style={styles.row}>
         <MenuCard
+          nombreItem="Padrones"
+          iconName="address-book"
+          color="#3F3F3F"
+          navPage="listado-padrones"
+        />
+        <MenuCard
           nombreItem="Mi
           Perfil"
           iconName="user-alt"
-          col="#3F3F3F"
+          color="#3F3F3F"
           navPage="profile"
         />
         <MenuCard
           nombreItem="Cerrar Sesión"
           iconName="door-open"
-          col="#3F3F3F"
+          color="#3F3F3F"
           navPage="login"
         />
-        <MenuCard isBlank={true} />
+        {/* <MenuCard isBlank={true} /> */}
       </View>
     </View>
   );

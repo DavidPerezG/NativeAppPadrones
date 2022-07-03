@@ -172,7 +172,11 @@ const DetallasPadron = ({route}) => {
 
   return (
     <Container>
-      <Header title="Detalles de Padron" />
+      <Header
+        title="Detalles de Padron"
+        isGoBack
+        onPressLeftButton={() => navigation.goBack()}
+      />
       <MenuContainer>
         <TitleLabel>{route.params?.nombrePadron}</TitleLabel>
         <Linepx />

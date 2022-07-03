@@ -101,7 +101,6 @@ const DetallesSeleccion = ({route}) => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    console.log('detalles');
     setData(route.params.data);
   }, []);
 

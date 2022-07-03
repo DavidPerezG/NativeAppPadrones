@@ -49,7 +49,6 @@ const BusquedaAvanzadaPredio = ({onSearch}) => {
   };
 
   const handleSearch = () => {
-    console.log(form);
     onSearch(form);
     setIsOpen(false);
     setForm({});

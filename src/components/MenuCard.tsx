@@ -14,10 +14,25 @@ import {useDispatch} from 'react-redux';
 // External dependencies
 import {dispatchClearAuth} from '../store/actions/auth';
 
-const MenuCard = props => {
-  // Props
-  const isBlank = Boolean(props?.isBlank);
+interface IMenuCard {
+  isBlank?: boolean;
+  unable?: boolean;
+  navPage?: string;
+  nombreItem?: string;
+  style?: object;
+  iconName?: string;
+  color?: string;
+}
 
+const MenuCard = ({
+  isBlank,
+  unable,
+  navPage,
+  nombreItem,
+  style,
+  iconName,
+  color,
+}: IMenuCard) => {
   // Navigation
   const navigation = useNavigation();
 
@@ -33,47 +48,45 @@ const MenuCard = props => {
     ]);
 
   const handleClick = () => {
-    if (props.unable === true) {
+    if (unable === true) {
       showAlert('Disculpa la molestia', 'En Desarrollo');
     } else {
-      if (props.navPage === 'cargosPadrones') {
-        global.padronSeleccionado = props.nombreItem;
-        navigation.navigate('cargosPadrones', {padronNombre: props.nombreItem});
+      if (navPage === 'cargosPadrones') {
+        global.padronSeleccionado = nombreItem;
+        navigation.navigate('cargosPadrones', {padronNombre: nombreItem});
         return null;
       }
 
-      if (props.navPage === 'login') {
+      if (navPage === 'login') {
         dispatchClearAuth(dispatch);
 
         navigation.reset({
           index: 0,
           // @ts-ignore
-          routes: [{name: props.navPage}],
+          routes: [{name: navPage}],
         });
       } else {
         // @ts-ignore
-        props.navPage ? navigation.navigate(props.navPage) : false;
+        navPage ? navigation.navigate(navPage) : false;
       }
     }
   };
 
   if (isBlank) {
-    return <View style={{...styles.squareStyleBlank, ...props.style}} />;
+    return <View style={{...styles.squareStyleBlank, ...style}} />;
   }
 
   return (
     <TouchableWithoutFeedback onPress={handleClick}>
-      <View style={{...styles.squareStyle, ...props.style}}>
+      <View style={{...styles.squareStyle, ...style}}>
         <FontAwesome5
-          name={props.iconName}
+          name={iconName}
           size={40}
           styles={styles.iconContainer}
           solid
-          color={props.col}
+          color={color}
         />
-        <Text style={[styles.text, {color: props.col}]}>
-          {props.nombreItem}
-        </Text>
+        <Text style={[styles.text, {color: color}]}>{nombreItem}</Text>
       </View>
     </TouchableWithoutFeedback>
   );

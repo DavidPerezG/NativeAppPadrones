@@ -30,7 +30,6 @@ const cerrarCorte = async (
   corteId: number,
   metodosDePago: TMetodosDePagoProps[],
 ) => {
-  console.log('cerrarCorte', corteId, metodosDePago);
   let result = false;
   try {
     const response = await HTTP.post(

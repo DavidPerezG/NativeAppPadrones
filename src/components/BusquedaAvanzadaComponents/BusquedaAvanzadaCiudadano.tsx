@@ -39,7 +39,6 @@ const BusquedaAvanzadaCiudadano = ({onSearch}) => {
       ...form,
       [name]: text,
     });
-    console.log('sucede');
   };
 
   const handleSearch = () => {
