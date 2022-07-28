@@ -9,8 +9,9 @@ const abrirCorte = async (totalDelFondo, unidadDeRecaudacionId) => {
     });
 
     if (
-      response?.data &&
-      Object.prototype.hasOwnProperty.call(response.data, 'id')
+      response?.data
+      // &&
+      // Object.prototype.hasOwnProperty.call(response.data, 'id')
     ) {
       return response?.data;
     }
@@ -38,13 +39,16 @@ const cerrarCorte = async (
     );
 
     if (
-      response?.data &&
-      Object.prototype.hasOwnProperty.call(response.data, 'id')
+      response?.data
+      // &&
+      // Object.prototype.hasOwnProperty.call(response.data, 'id')
     ) {
       result = true;
     }
   } catch (error) {
     console.error(error, error?.response?.data?.detail);
+    console.log(error);
+    console.log(error.response.data);
   }
 
   return result;

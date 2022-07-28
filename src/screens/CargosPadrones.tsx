@@ -1,3 +1,4 @@
+//External dependencies
 import React, {useState, useEffect} from 'react';
 import {
   ActivityIndicator,
@@ -10,12 +11,22 @@ import {useNavigation} from '@react-navigation/native';
 import moment from 'moment';
 import {SwipeListView} from 'react-native-swipe-list-view';
 import NetInfo from '@react-native-community/netinfo';
+import {useSelector} from 'react-redux';
+import {DropdownAlertType} from 'react-native-dropdownalert';
 
+//Internal dependencies
 import BusquedaAvanzadaCiudadano from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaCiudadano';
 import BusquedaAvanzadaPredio from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaPredio';
 import BusquedaAvanzadaVehiculo from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaVehiculo';
 import BusquedaAvanzadaEmpresa from '../components/BusquedaAvanzadaComponents/BusquedaAvanzadaEmpresa';
+import fonts from '../utils/fonts';
+import Header from '../components/Header';
+import CardItem from '../components/CardItem';
+import Button from '../components/DefaultButton';
+import DropdownButton from '../components/DropdownButton';
+import {useNotification} from '../components/DropdownalertProvider';
 
+//Services
 import {getContribuyentes} from '../services/catalagos';
 import {
   getAdeudoCiudadano,
@@ -31,14 +42,10 @@ import {
   imprimirConstancia,
   getRecibos,
 } from '../services/cajaPdf';
-import {useSelector} from 'react-redux';
 
-import fonts from '../utils/fonts';
-import Header from '../components/Header';
-import CardItem from '../components/CardItem';
-import Button from '../components/DefaultButton';
-import DropdownButton from '../components/DropdownButton';
-import {useNotification} from '../components/DropdownalertProvider';
+//Types & Interfaces
+import {Cargo} from '../types/cargoInterface';
+import {Ciudadano} from '../types/ciudadanoInterface';
 
 const datosExtraPadrones = {
   Ciudadano: {numero: 1, variableDeNombre: 'nombre_completo'},
@@ -57,17 +64,20 @@ const datosExtraPadrones = {
 };
 
 const CargosPadrones = ({route}) => {
+  // States
   const [searchText, setSearchText] = useState<string>('');
   const [nameSearch, setNameSearch] = useState<Array<object>>([]);
 
   const [padronCorrespondiente, setPadronCorrespondiente] = useState<
     Array<string>
   >([]);
-  const [resultCargos, setResultCargos] = useState<Array<object>>([]);
+
+  const [resultCargos, setResultCargos] = useState<Array<Cargo>>([]);
   const [resultArrCargos, setResultArrCargos] = useState<Array<object>>([]);
   const [resultPadrones, setResultPadrones] = useState<Array<object>>([]);
-  const [contribuyente, setContribuyente] = useState<object>();
+  const [contribuyente, setContribuyente] = useState<Ciudadano>();
   const [importeTotal, setImporteTotal] = useState<number>(0);
+  const [netpayLoad, setNetpayLoad] = useState(false);
 
   const [nombrePadron, setNombrePadron] = useState<string>();
   const [numeroPadron, setNumeroPadron] = useState<number>();
@@ -77,10 +87,29 @@ const CargosPadrones = ({route}) => {
     useState<boolean>(false);
   const [loadingSituacion, setLoadingSituacion] = useState<boolean>(false);
 
+  // Notification
   const notify = useNotification();
+
+  // Navigation
   const navigation = useNavigation();
+
+  // Redux
   const corte = useSelector(state => state.user.corte);
   const hasCorte = useSelector(state => Boolean(state.user.corte));
+  const entidadMunicipalConfig = useSelector(
+    state => state.user.entidad_municipal.configuracion,
+  );
+
+  const showAlert = (
+    mensaje?: string,
+    titulo?: string,
+    type?: DropdownAlertType,
+  ) =>
+    notify({
+      type: type || 'error',
+      title: titulo || 'Problema en la busqueda',
+      message: mensaje || '',
+    });
 
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
@@ -124,13 +153,6 @@ const CargosPadrones = ({route}) => {
     return false;
   };
 
-  const checkCorte = () => {
-    if (hasCorte) {
-      showAlert('Ya se encuentra un corte abierto', 'Alerta');
-      navigation.navigate('menu');
-    }
-  };
-
   const corteIsClosed = (): boolean => {
     const {apertura} = corte;
     const currentDay = moment().format('DD');
@@ -142,14 +164,7 @@ const CargosPadrones = ({route}) => {
     }
   };
 
-  const showAlert = (mensaje?: string, titulo?: string) =>
-    notify({
-      type: 'error',
-      title: titulo || 'Problema en la busqueda',
-      message: mensaje || '',
-    });
-
-  const reduceArrCargos = (cargo: object) => {
+  const reduceArrCargos = (cargo: Cargo) => {
     const {
       descuentos_especiales,
       actualizaciones,
@@ -362,7 +377,10 @@ const CargosPadrones = ({route}) => {
         ...nameSearch,
         padronData[datosExtraPadrones[nombrePadron]?.variableDeNombre],
       ]);
-      setImporteTotal(importeTotal + Math.round(total));
+
+      setImporteTotal(
+        importeTotal + Math.round((total + Number.EPSILON) * 100) / 100,
+      );
     }
     setIsLoading(false);
   };
@@ -397,6 +415,7 @@ const CargosPadrones = ({route}) => {
   //Guarda el nombre en variable de estado de el dato correspondiente a su padrón
 
   const calcular = async () => {
+    setNetpayLoad(true);
     setIsLoading(true);
     if (hasCorte) {
       if (corteIsClosed()) {
@@ -405,11 +424,16 @@ const CargosPadrones = ({route}) => {
             let paymentResponse = await NativeModules.RNNetPay.doTrans(
               importeTotal.toFixed(2),
             );
+            console.log(paymentResponse);
             if (paymentResponse.success === true) {
-              showAlert('Pago Realizado con Exito', 'Pago Completado');
+              showAlert(
+                'Pago Realizado con Exito',
+                'Pago Completado',
+                'success',
+              );
               let recibos = await getRecibos(
                 contribuyente?.id,
-                [{metodo: 1, importe: importeTotal}],
+                [{metodo: 3, importe: importeTotal}],
                 resultCargos?.flatMap((cargo, index) =>
                   cargo !== undefined
                     ? {
@@ -423,6 +447,7 @@ const CargosPadrones = ({route}) => {
                       }
                     : [],
                 ),
+                paymentResponse,
               );
 
               navigation.navigate('recibos-de-caja', {recibos});
@@ -445,6 +470,7 @@ const CargosPadrones = ({route}) => {
       showAlert('Se requiere un corte abierto', 'No se puede proceder');
     }
     setIsLoading(false);
+    setNetpayLoad(false);
   };
 
   const handleObligacionesPdf = async () => {
@@ -507,7 +533,17 @@ const CargosPadrones = ({route}) => {
       <Header
         title="Cargos"
         isGoBack
-        onPressLeftButton={() => navigation.goBack()}
+        onPressLeftButton={() =>
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                // @ts-ignore
+                name: 'menu',
+              },
+            ],
+          })
+        }
       />
 
       <MenuContainer>
@@ -608,6 +644,7 @@ const CargosPadrones = ({route}) => {
           renderItem={({item, index}) => {
             return (
               <DropdownButton
+                collapsable
                 leftText={
                   padronCorrespondiente[index] +
                   ':' +
@@ -668,7 +705,7 @@ const CargosPadrones = ({route}) => {
           />
         ) : null}
         <Row>
-          <TouchableWithoutFeedback onPress={calcular}>
+          <TouchableWithoutFeedback onPress={calcular} disabled={netpayLoad}>
             <PaymentButton>
               <LabelButton>Pagar Total</LabelButton>
             </PaymentButton>

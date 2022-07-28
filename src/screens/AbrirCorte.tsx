@@ -14,6 +14,8 @@ import {abrirCorte} from '../services/recaudacion';
 import {dispatchSetCorte} from '../store/actions/user';
 import ModalMessage from '../components/ModalMessage';
 import {useNavigation} from '@react-navigation/native';
+import {getUserInfo} from '../services/user';
+import {dispatchSetUserInfo} from '../store/actions/user';
 
 const AbrirCorteScreen = () => {
   // Component's state
@@ -44,6 +46,16 @@ const AbrirCorteScreen = () => {
         style: 'cancel',
       },
     ]);
+
+  const setUserInfo = async () => {
+    const userInfo = await getUserInfo();
+
+    if (userInfo) {
+      dispatchSetUserInfo(dispatch, userInfo);
+
+      return;
+    }
+  };
 
   // Handlers
   const fetchUnidades = async () => {
@@ -79,6 +91,7 @@ const AbrirCorteScreen = () => {
 
     // @ts-ignore
     const response = await abrirCorte(total, unidadDeRecaudacion.id);
+    setUserInfo();
     if (!response.response === null) {
       dispatchSetCorte(dispatch, response);
       navigation.reset({
@@ -99,7 +112,17 @@ const AbrirCorteScreen = () => {
         <Header
           title="Abrir Corte"
           isGoBack
-          onPressLeftButton={() => navigation.goBack()}
+          onPressLeftButton={() =>
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  // @ts-ignore
+                  name: 'menu',
+                },
+              ],
+            })
+          }
         />
 
         <KeyboardAwareScrollView

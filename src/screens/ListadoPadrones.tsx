@@ -1,28 +1,38 @@
+//External dependencies
 import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {ActivityIndicator, FlatList} from 'react-native';
 import styled from 'styled-components/native';
+import {DropdownAlertType} from 'react-native-dropdownalert';
 
-import {getPadrones} from '../services/catalagos';
+// Internal dependencies
 import Header from '../components/Header';
 import MenuCard from '../components/MenuCard';
+import {useNotification} from '../components/DropdownalertProvider';
 
+//Services
+import {getPadrones} from '../services/catalagos';
+
+// Types & Interfaces
 import {Padron} from '../types/padronInterface';
 
 const padronParams = {
-  Ciudadano: {icon_name: 'users', nav_page: ''},
+  Ciudadano: {icon_name: 'users', nav_page: 'ciudadanos-search'},
   Predio: {icon_name: 'home', nav_page: ''},
-  Empresa: {icon_name: 'store-alt', nav_page: ''},
-  Vehiculo: {icon_name: 'car', nav_page: ''},
-  Alcohol: {icon_name: 'cocktail', nav_page: ''},
-  Hospedaje: {icon_name: 'suitcase-rolling', nav_page: ''},
-  Arrendamiento: {icon_name: 'laptop-house', nav_page: ''},
-  Notario: {icon_name: 'handshake', nav_page: ''},
-  Nomina: {icon_name: 'hand-holding-usd', nav_page: ''},
-  cedular: {icon_name: 'user-tag', nav_page: ''},
+  Empresa: {icon_name: 'store-alt', nav_page: 'empresas-search'},
+  Vehiculo: {icon_name: 'car', nav_page: 'vehiculos-search'},
+  Alcohol: {icon_name: 'cocktail', nav_page: 'alcoholes-search'},
+  Hospedaje: {icon_name: 'suitcase-rolling', nav_page: 'hospedajes-search'},
+  Arrendamiento: {icon_name: 'laptop-house', nav_page: 'arrendamientos-search'},
+  Notario: {icon_name: 'handshake', nav_page: 'notarios-search'},
+  Nomina: {icon_name: 'hand-holding-usd', nav_page: 'nominas-search'},
+  cedular: {icon_name: 'user-tag', nav_page: 'cedulares-search'},
   Agencia: {icon_name: 'hotel', nav_page: 'agencias-search'},
-  'Casa De Empeño ': {icon_name: 'funnel-dollar', nav_page: ''},
-  'Juego De Azar': {icon_name: 'dice', nav_page: ''},
+  'Casa De Empeño ': {
+    icon_name: 'funnel-dollar',
+    nav_page: 'casas-de-empenio-search',
+  },
+  'Juego De Azar': {icon_name: 'dice', nav_page: 'juegos-de-azar-search'},
 };
 
 const ListadoPadrones = () => {
@@ -30,6 +40,19 @@ const ListadoPadrones = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigation = useNavigation();
+
+  const notify = useNotification();
+
+  const showAlert = (
+    mensaje?: string,
+    titulo?: string,
+    type?: DropdownAlertType,
+  ) =>
+    notify({
+      type: type || 'error',
+      title: titulo || 'Problema en la busqueda',
+      message: mensaje || '',
+    });
 
   const fetchPadron = async () => {
     setIsLoading(true);
@@ -39,7 +62,15 @@ const ListadoPadrones = () => {
   };
 
   const goBack = () => {
-    navigation.goBack();
+    navigation.reset({
+      index: 0,
+      routes: [
+        {
+          // @ts-ignore
+          name: 'menu',
+        },
+      ],
+    });
   };
 
   useEffect(() => {
@@ -61,10 +92,10 @@ const ListadoPadrones = () => {
             nombreItem={item.model}
             iconName={padronParams[item.model].icon_name}
             color="#3F3F3F"
+            unable={item.model === 'Predio'}
             navPage={padronParams[item.model].nav_page}
-            handleClick={false}
+            handleClick={true}
             navProps={navigation}
-            onPress={() => console.log('pressed')}
           />
         )}
         keyExtractor={item => item.id.toString()}

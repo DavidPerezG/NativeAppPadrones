@@ -10,6 +10,7 @@ import DropdownButton from '../DropdownButton';
 
 interface ISwipeListContainer {
   data: Array<object> | undefined;
+  extraData?: any | undefined;
   parameterToList: string;
   onDelete: (rowKey) => void;
   onEndReached: () => void;
@@ -17,6 +18,7 @@ interface ISwipeListContainer {
 
 const SwipeListContainer = ({
   data,
+  extraData,
   parameterToList,
   onDelete,
   onEndReached,
@@ -32,24 +34,34 @@ const SwipeListContainer = ({
     onDelete(rowKey);
   };
 
+  const handleLeftText = item => {
+    if (item[parameterToList] === undefined || item[parameterToList] === null) {
+      return '';
+    } else {
+      return String(item[parameterToList]);
+    }
+  };
+
   const renderFooterComponent = () => (
-    <TouchableWithoutFeedback onPress={onEndReached}>
-      {data ? (
-        <MoreDataButton>
-          <FontAwesome5 name={'plus'} size={30} solid color={'black'} />
-        </MoreDataButton>
-      ) : (
-        <View />
-      )}
-    </TouchableWithoutFeedback>
+    // <TouchableWithoutFeedback onPress={onEndReached}>
+    //   {data ? (
+    //     <MoreDataButton>
+    //       <FontAwesome5 name={'plus'} size={30} solid color={'black'} />
+    //     </MoreDataButton>
+    //   ) : (
+    //     <View />
+    //   )}
+    // </TouchableWithoutFeedback>
+    <View style={{height: 100}} />
   );
 
   return (
     <SwipeListView
       data={data}
+      extraData={extraData}
       keyExtractor={item => item.id}
       onEndReached={onEndReached}
-      onEndReachedThreshold={0.1}
+      onEndReachedThreshold={0.01}
       ListFooterComponent={renderFooterComponent()}
       contentContainerStyle={{
         alignItems: 'center',
@@ -76,7 +88,9 @@ const SwipeListContainer = ({
       leftOpenValue={75}
       rightOpenValue={-75}
       renderItem={({item, index}) => {
-        return <DropdownButton leftText={item[parameterToList]} />;
+        return (
+          <DropdownButton collapsable={false} leftText={handleLeftText(item)} />
+        );
       }}
     />
   );

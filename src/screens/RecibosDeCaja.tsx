@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, FlatList} from 'react-native';
+import {View, FlatList, NativeModules} from 'react-native';
 import styled from 'styled-components/native';
 import {useNavigation} from '@react-navigation/native';
 
@@ -43,6 +43,8 @@ const RecibosDeCaja = ({route}) => {
   const [recibos, setRecibos] = useState();
   const [loadingRecibo, setLoadingRecibo] = useState(false);
   const [loadingTicket, setLoadingTicket] = useState(false);
+  const [loadingTicketPersonalized, setLoadingTicketPersonalized] =
+    useState(false);
 
   const navigation = useNavigation();
 
@@ -70,6 +72,13 @@ const RecibosDeCaja = ({route}) => {
     );
     navigation.navigate('preview-pdf', {base64});
     setLoadingTicket(false);
+  };
+
+  const getPersonalizedTicket = async () => {
+    setLoadingTicketPersonalized(true);
+    let ticket = await NativeModules.RNNetPay.printTicket();
+    console.log(ticket);
+    setLoadingTicketPersonalized(false);
   };
 
   return (
@@ -101,6 +110,12 @@ const RecibosDeCaja = ({route}) => {
           text="Imprimir Ticket"
           style={{marginBottom: 10}}
           onPress={() => getTicket()}
+        />
+        <Button
+          loading={loadingTicketPersonalized}
+          text="Imprimir Ticket Personalizado"
+          style={{marginBottom: 10}}
+          onPress={() => getPersonalizedTicket()}
         />
         {/* <Button text="Facturar" style={{marginBottom: 10}} /> */}
 

@@ -15,29 +15,10 @@ import ParamsListRowButtons from '../../components/padronesSearchComponents/Para
 import ModalSeleccionar from '../../components/padronesSearchComponents/ModalSeleccionar';
 
 // Services
-import {getAgencias, deleteAgencia} from '../../services/empresas/agencias';
-import {getAlcoholes, deleteAlcohol} from '../../services/empresas/alcoholes';
 import {
-  getArrendamientos,
-  deleteArrendamiento,
-} from '../../services/empresas/arrendamientos';
-
-import {
-  getCasasDeEmpenio,
-  deleteCasaDeEmpenio,
-} from '../../services/empresas/casasDeEmpenio';
-import {getCedulares, deleteCedular} from '../../services/empresas/cedulares';
-import {getEmpresas, deleteEmpresas} from '../../services/empresas/empresas';
-import {
-  getHospedajes,
-  deleteHospedaje,
-} from '../../services/empresas/hospedajes';
-import {
-  deleteJuegoDeAzar,
   getJuegosDeAzar,
+  deleteJuegoDeAzar,
 } from '../../services/empresas/juegosDeAzar';
-import {getNominas, deleteNomina} from '../../services/empresas/nominas';
-import {getNotarios, deleteNotario} from '../../services/empresas/notarios';
 
 // Types
 import {Empresa} from '../../types/empresaInterface';
@@ -62,14 +43,14 @@ const parametrosEmpresa = {
 type ParamsEmpresa = 'razon_social' | 'nombre_comercial' | 'RFC';
 type SortingBy = 'ascending' | 'descending' | 'id';
 
-const AgenciasSearch = () => {
+const JuegosDeAzarSearch = () => {
   //QUESTION el delete de agencia no lo elimina de la base de datos solo me da un get de la info
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState<boolean>(false);
   const [sortingBy, setSortingBy] = useState<SortingBy>('id');
   const [selectedOption, setSelectedOption] = useState();
-  const [listAgencias, setListAgencias] = useState<Array<Empresa>>();
+  const [listEmpresas, setListEmpresas] = useState<Array<Empresa>>();
   const [parametroPadron, setParametroPadron] =
     useState<ParamsEmpresa>('razon_social');
 
@@ -107,8 +88,8 @@ const AgenciasSearch = () => {
   // funcion cuando hay una nueva busqueda, inicializa variable de listado y verifica si se utilizo la busqueda avanzada
   const onSearch = (searchText: string, form: object) => {
     setIsLoading(true);
-    let emptyAgencia: Empresa = {};
-    searchForm.current = emptyAgencia;
+    let emptyEmpresa: Empresa = {};
+    searchForm.current = emptyEmpresa;
     searchForm.current[parametroPadron] = searchText;
     if (form) {
       searchForm.current = form;
@@ -123,25 +104,26 @@ const AgenciasSearch = () => {
       setIsLoading(false);
     } else {
       currentPage.current = 1;
-      searchAgencia();
+      searchEmpresa();
     }
   };
 
   //funcion para buscar agencia o continuar con la paginacion
-  const searchAgencia = async () => {
+  const searchEmpresa = async () => {
+    console.log('buscarndo');
     setIsLoading(true);
     let response;
     let razon_social = searchForm.current?.razon_social;
     let nombre_comercial = searchForm.current?.nombre_comercial;
     let RFC = searchForm.current?.RFC;
-    response = await getAgencias(
+    response = await getJuegosDeAzar(
       razon_social,
       nombre_comercial,
       RFC,
       currentPage.current,
     );
     if (response) {
-      setNewAgencias(response.results);
+      setNewEmpresa(response.results);
     } else {
       showAlert('', 'No hay mas datos a mostrar', 'info');
       setIsLoading(false);
@@ -149,28 +131,26 @@ const AgenciasSearch = () => {
   };
 
   // Listar los nuevos datos encontrados
-  const setNewAgencias = response => {
-    let newData = listAgencias;
+  const setNewEmpresa = response => {
+    let newData = listEmpresas;
     currentPage.current === 1
       ? (newData = response)
-      : response.map(item => {
-          newData = [...newData!, item];
-        });
+      : response.map(item => (newData = [...newData, item]));
+
     currentPage.current++;
     setIsLoading(false);
     sortList('id');
-    setListAgencias(newData);
+    setListEmpresas(newData);
   };
 
   // Elimina un dato listado en la busqueda encontrada
   const deleteRow = async rowKey => {
-    const newData = [...listAgencias!];
-    const prevIndex = listAgencias!.findIndex(padron => padron.id === rowKey);
-    let response = await deleteAgencia(rowKey);
-    console.log(response);
+    const newData = [...listEmpresas!];
+    const prevIndex = listEmpresas!.findIndex(padron => padron.id === rowKey);
+    let response = await deleteJuegoDeAzar(rowKey);
     newData.splice(prevIndex!, 1);
 
-    setListAgencias(newData);
+    setListEmpresas(newData);
   };
 
   // Crea las opciones listadas y a poder escoger dentro del modal <ModalSeleccionar />
@@ -199,7 +179,7 @@ const AgenciasSearch = () => {
   };
 
   const sortList = (value: SortingBy) => {
-    if (listAgencias) {
+    if (listEmpresas) {
       console.log(sortingBy);
       value === 'ascending' ? sortListAscending() : null;
       value === 'descending' ? sortListDescending() : null;
@@ -211,42 +191,42 @@ const AgenciasSearch = () => {
   useEffect(() => {}, [sortingBy]);
 
   const sortListAscending = () => {
-    const sortedAgencias = listAgencias!.sort(function (a, b) {
+    const sortedList = listEmpresas!.sort(function (a, b) {
       return a[parametroPadron].localeCompare(b[parametroPadron]);
     });
 
-    setListAgencias(sortedAgencias);
+    setListEmpresas(sortedList);
   };
 
   const sortListDescending = () => {
-    const sortedAgencias = listAgencias!
+    const sortedList = listEmpresas!
       .sort(function (a, b) {
         return a[parametroPadron].localeCompare(b[parametroPadron]);
       })
       .reverse();
 
-    setListAgencias(sortedAgencias);
+    setListEmpresas(sortedList);
   };
 
   const sortListById = () => {
-    const sortedAgencias = listAgencias!.sort(function (a, b) {
+    const sortedList = listEmpresas!.sort(function (a, b) {
       return a.id - b.id;
     });
 
-    setListAgencias(sortedAgencias);
+    setListEmpresas(sortedList);
   };
 
   return (
     <>
       <Container>
         <Header
-          title="Agencias"
+          title="Juegos De Azar"
           isGoBack
           onPressLeftButton={() => navigation.goBack()}
         />
         <TopContainer>
           <SearchInput
-            placeholderText="Buscar Agencia..."
+            placeholderText="Buscar Juego de Azar..."
             advanceSearch="Empresa"
             loading={isLoading}
             onSearch={onSearch}
@@ -261,19 +241,25 @@ const AgenciasSearch = () => {
           />
         </TopContainer>
         <SwipeListContainer
-          data={listAgencias}
+          data={listEmpresas}
           extraData={sortingBy}
           parameterToList={parametroPadron}
           onDelete={rowKey => {
             setSelectedOption(rowKey);
             setIsOpenDelete(true);
           }}
-          onEndReached={searchAgencia}
+          onEndReached={searchEmpresa}
         />
         <FloatingButton>
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => console.log(listAgencias?.length)}>
+            onPress={() =>
+              showAlert(
+                'Disculpa la molestia',
+                'Funcionalidad en Mantenimiento',
+                'info',
+              )
+            }>
             <FontAwesome5 name={'plus'} size={35} solid color={'#fff'} />
           </TouchableOpacity>
         </FloatingButton>
@@ -334,4 +320,4 @@ const FloatingButton = styled.View`
   elevation: 10;
 `;
 
-export default AgenciasSearch;
+export default JuegosDeAzarSearch;

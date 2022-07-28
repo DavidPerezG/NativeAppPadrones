@@ -1,12 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {
-  StyleSheet,
-  Text,
-  View,
   Dimensions,
   TouchableWithoutFeedback,
   Modal,
-  TextInput,
   FlatList,
 } from 'react-native';
 import styled from 'styled-components/native';

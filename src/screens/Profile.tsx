@@ -20,7 +20,17 @@ const ProfileScreen = () => {
       <Header
         title="Perfil"
         isGoBack
-        onPressLeftButton={() => navigation.goBack()}
+        onPressLeftButton={() =>
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                // @ts-ignore
+                name: 'menu',
+              },
+            ],
+          })
+        }
       />
       <ScrollView>
         <AvatarContainer>

@@ -36,12 +36,18 @@ const imprimirConstancia = async padron_id => {
   return base64;
 };
 
-const getRecibos = async (ciudadano, metodos_de_pago, padrones) => {
+const getRecibos = async (
+  ciudadano,
+  metodos_de_pago,
+  padrones,
+  observaciones,
+) => {
   let result;
   let body = {
     ciudadano: ciudadano,
     metodos_de_pago: metodos_de_pago,
     padrones: padrones,
+    observaciones: observaciones,
   };
   try {
     let response = await http.post('/recaudacion/recibos/', body);

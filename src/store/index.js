@@ -19,3 +19,4 @@ const _createStore = (initialState = {}) => {
 export const {store, persistor} = _createStore();
 
 export default store;
+store.subscribe(() => console.log(store));

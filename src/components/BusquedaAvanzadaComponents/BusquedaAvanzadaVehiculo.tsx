@@ -1,3 +1,4 @@
+// External dependencies
 import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
@@ -9,23 +10,30 @@ import {
   TextInput,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-
 import Icon from 'react-native-vector-icons/FontAwesome';
+
+// Internal dependencies
 import fonts from '../../utils/fonts';
 
+// Services
+
 import {
-  getLineasVehiculares,
-  getMarcasVehiculos,
-  getServiciosVehiculo,
-  getEstadosVehiculo,
-  getTiposVehiculo,
   getClasesVehiculos,
-} from '../../services/busquedaVehicular';
+  getEstadosVehiculo,
+  getLineasVehiculares,
+  getMarcasVehiculo,
+  getServiciosVehiculo,
+  getTiposVehiculo,
+} from '../../services/recaudacion/vehiculos';
+
+// Types
+import {TipoVehiculo} from '../../types/tipoVehiculoInterface';
+import {ServicioVehiculo} from '../../types/serviciosVehiculoInterface';
+import {EstadoVehiculo} from '../../types/estadoVehiculoInterface';
+import {MarcaVehiculo} from '../../types/marcaVehiculoInterface';
 
 const BusquedaAvanzadaVehiculo = ({onSearch}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [metodo, setMetodo] = useState();
-  const [importe, setImporte] = useState(0.0);
   const [form, setForm] = useState({});
   const [opened, setOpened] = useState(false);
   const [openedDos, setOpenedDos] = useState(false);
@@ -33,12 +41,18 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
   const [openedCuatro, setOpenedCuatro] = useState(false);
   const [openedCinco, setOpenedCinco] = useState(false);
   const [selectedValue, setSelectedValue] = useState(['', '', '', '', '']);
-  const [lineasVehiculares, setLineasVehiculares] = useState([]);
-  const [marcasVehiculares, setMarcasVehiculares] = useState([]);
-  const [serviciosVehiculares, setServiciosVehiculares] = useState([]);
-  const [estadosVehiculares, setEstadosVehiculares] = useState([]);
-  const [tiposVehiculos, setTiposVehiculos] = useState([]);
-  const [clasesVehiculos, setClasesVehiculos] = useState();
+  const [lineasVehiculares, setLineasVehiculares] = useState<Array<any>>([]);
+  const [marcasVehiculares, setMarcasVehiculares] = useState<
+    Array<MarcaVehiculo>
+  >([]);
+  const [serviciosVehiculares, setServiciosVehiculares] = useState<
+    Array<ServicioVehiculo>
+  >([]);
+  const [estadosVehiculares, setEstadosVehiculares] = useState<
+    Array<EstadoVehiculo>
+  >([]);
+  const [tiposVehiculos, setTiposVehiculos] = useState<Array<TipoVehiculo>>([]);
+  const [clasesVehiculos, setClasesVehiculos] = useState<Array<any>>();
 
   useEffect(() => {
     getInfo();
@@ -48,7 +62,7 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
     const lineas = await getLineasVehiculares();
     setLineasVehiculares(lineas);
 
-    const marcas = await getMarcasVehiculos();
+    const marcas = await getMarcasVehiculo();
     setMarcasVehiculares(marcas);
 
     const servicios = await getServiciosVehiculo();
@@ -64,7 +78,18 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
     setClasesVehiculos(clases);
   };
 
+  const convertData = array => {
+    let data = array?.map(el => {
+      return {
+        label: el.nombre,
+        value: el.id,
+      };
+    });
+    return data;
+  };
+
   const handleChange = (name, text) => {
+    console.log(text);
     setForm({
       ...form,
       [name]: text,
@@ -75,14 +100,7 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
     setIsOpen(false);
     onSearch(form);
     setForm({});
-  };
-
-  const handleOpenState = index => {
-    const arrayOpen = opened;
-    opened[index] === true
-      ? (arrayOpen[index] = false)
-      : (arrayOpen[index] = true);
-    setOpened(arrayOpen);
+    setSelectedValue(['', '', '', '', '']);
   };
 
   const handleSelectedValue = (index, newLabel) => {
@@ -128,11 +146,17 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
               <Text style={styles.label}>Tipo de Vehículo</Text>
               <View>
                 <DropDownPicker
-                  style={styles.textInputContainer}
-                  items={tiposVehiculos}
+                  style={styles.dropdownContainer}
+                  itemSeparator
+                  itemSeparatorStyle={styles.itemSeparator}
+                  closeAfterSelecting
+                  closeOnBackPressed
+                  onClose={() => (opened ? setOpened(false) : setOpened(true))}
+                  modalTitle="Tipos de Vehiculo"
+                  items={convertData(tiposVehiculos)}
                   placeholderStyle={{color: 'gray', marginLeft: 5}}
-                  placeholder={selectedValue[0] || 'Tipo de Vehículo'}
-                  dropDownDirection="TOP"
+                  placeholder={selectedValue[0] || 'Tipo'}
+                  listMode="MODAL"
                   open={opened}
                   onPress={() => {
                     opened ? setOpened(false) : setOpened(true);
@@ -150,11 +174,20 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
               <Text style={styles.label}>Línea</Text>
               <View>
                 <DropDownPicker
-                  style={styles.textInputContainer}
-                  items={lineasVehiculares}
+                  style={styles.dropdownContainer}
+                  itemSeparator
+                  itemSeparatorStyle={styles.itemSeparator}
+                  closeAfterSelecting
+                  closeOnBackPressed
+                  onClose={() =>
+                    openedDos ? setOpenedDos(false) : setOpenedDos(true)
+                  }
+                  modalTitle="Lineas de Vehículo"
+                  items={convertData(lineasVehiculares)}
                   placeholderStyle={{color: 'gray', marginLeft: 5}}
                   placeholder={selectedValue[1] || 'Línea'}
                   dropDownDirection="TOP"
+                  listMode="MODAL"
                   open={openedDos}
                   onPress={() => {
                     openedDos ? setOpenedDos(false) : setOpenedDos(true);
@@ -173,10 +206,19 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
               <View>
                 <DropDownPicker
                   style={styles.textInputContainer}
-                  items={clasesVehiculos}
+                  itemSeparator
+                  itemSeparatorStyle={styles.itemSeparator}
+                  closeAfterSelecting
+                  closeOnBackPressed
+                  onClose={() =>
+                    openedCinco ? setOpenedCinco(false) : setOpenedCinco(true)
+                  }
+                  modalTitle="Clases de Vehículo"
+                  items={convertData(clasesVehiculos)}
                   placeholderStyle={{color: 'gray', marginLeft: 5}}
                   placeholder={selectedValue[4] || 'Clase'}
                   dropDownDirection="TOP"
+                  listMode="MODAL"
                   open={openedCinco}
                   onPress={() => {
                     openedCinco ? setOpenedCinco(false) : setOpenedCinco(true);
@@ -190,15 +232,25 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
                 />
               </View>
             </View>
+
             <View style={styles.textInput}>
               <Text style={styles.label}>Servicio</Text>
               <View>
                 <DropDownPicker
                   style={styles.textInputContainer}
-                  items={serviciosVehiculares}
+                  itemSeparator
+                  itemSeparatorStyle={styles.itemSeparator}
+                  closeAfterSelecting
+                  closeOnBackPressed
+                  onClose={() =>
+                    openedTres ? setOpenedTres(false) : setOpenedTres(true)
+                  }
+                  modalTitle="Servicio de Vehículo"
+                  items={convertData(serviciosVehiculares)}
                   placeholderStyle={{color: 'gray', marginLeft: 5}}
                   placeholder={selectedValue[2] || 'Servicio'}
                   dropDownDirection="TOP"
+                  listMode="MODAL"
                   open={openedTres}
                   onPress={() => {
                     openedTres ? setOpenedTres(false) : setOpenedTres(true);
@@ -217,10 +269,21 @@ const BusquedaAvanzadaVehiculo = ({onSearch}) => {
               <View>
                 <DropDownPicker
                   style={styles.textInputContainer}
-                  items={estadosVehiculares}
+                  itemSeparator
+                  itemSeparatorStyle={styles.itemSeparator}
+                  closeAfterSelecting
+                  closeOnBackPressed
+                  onClose={() =>
+                    openedCuatro
+                      ? setOpenedCuatro(false)
+                      : setOpenedCuatro(true)
+                  }
+                  modalTitle="Estatus de Vehículo"
+                  items={convertData(estadosVehiculares)}
                   placeholderStyle={{color: 'gray', marginLeft: 5}}
                   placeholder={selectedValue[3] || 'Estatus del Vehículo'}
                   dropDownDirection="TOP"
+                  listMode="MODAL"
                   open={openedCuatro}
                   onPress={() => {
                     openedCuatro
@@ -294,6 +357,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   textInputContainer: {
+    color: 'black',
     marginVertical: 0,
     width: 336,
     height: 46,
@@ -304,7 +368,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#a3a3a3',
   },
+  dropdownContainer: {
+    color: 'black',
+    marginVertical: 0,
+    width: 336,
+    height: 46,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#a3a3a3',
+    zIndex: 100,
+  },
   textInputStyle: {
+    color: 'black',
     height: '100%',
     marginLeft: 14,
     fontSize: 13,
@@ -328,6 +406,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   textInput: {
+    color: 'black',
     marginTop: 5,
   },
   iconAvanzadoContainer: {
@@ -337,5 +416,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
+  },
+  itemSeparator: {
+    width: '98%',
+    alignSelf: 'center',
+    backgroundColor: '#c4c4c4',
   },
 });

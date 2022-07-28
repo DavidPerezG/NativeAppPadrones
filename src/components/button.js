@@ -1,12 +1,7 @@
 // Dependencies
 import React from 'react';
-import {
-  ViewPropTypes,
-  TouchableWithoutFeedback,
-  ActivityIndicator,
-} from 'react-native';
-import propTypes from 'prop-types';
-import styled from 'styled-components';
+import {TouchableWithoutFeedback, ActivityIndicator} from 'react-native';
+import styled from 'styled-components/native';
 
 import {primaryColor} from '../utils/colors';
 
@@ -31,15 +26,6 @@ export default function Button({
     </TouchableWithoutFeedback>
   );
 }
-
-Button.propTypes = {
-  text: propTypes.string,
-  onPress: propTypes.func.isRequired,
-  style: ViewPropTypes.style,
-  textStyle: ViewPropTypes.style,
-  disabled: propTypes.bool,
-  loading: propTypes.bool,
-};
 
 Button.defaultProps = {
   text: undefined,

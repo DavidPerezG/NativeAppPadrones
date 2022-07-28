@@ -127,7 +127,7 @@ public class RNNetPayModule extends ReactContextBaseJavaModule {
         //Crear una página
         IPage page = this.getApiInstance().createPage();
 
-        //Crear unidad qutiene texto e cony otros formatos
+        //Crear unidad que tiene texto e cony otros formatos
         IPage.ILine.IUnit unit1 = page.createUnit();
         unit1.setText("Texto 1");
         unit1.setGravity(Gravity.START);

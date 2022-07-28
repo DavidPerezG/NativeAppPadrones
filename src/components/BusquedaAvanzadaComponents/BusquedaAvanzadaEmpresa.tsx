@@ -14,7 +14,15 @@ import DropDownPicker from 'react-native-dropdown-picker';
 
 import fonts from '../../utils/fonts';
 
-const BusquedaAvanzadaEmpresa = ({onSearch}) => {
+interface IBusquedaAvanzadaEmpresa {
+  onSearch: () => void;
+  shortAdvanceSearch: boolean;
+}
+
+const BusquedaAvanzadaEmpresa = ({
+  onSearch,
+  shortAdvanceSearch,
+}: IBusquedaAvanzadaEmpresa) => {
   const [isOpen, setIsOpen] = useState(false);
   const [metodo, setMetodo] = useState();
   const [importe, setImporte] = useState(0.0);
@@ -81,6 +89,7 @@ const BusquedaAvanzadaEmpresa = ({onSearch}) => {
               <View style={styles.textInputContainer}>
                 <TextInput
                   onChangeText={text => handleChange('razon_social', text)}
+                  color="black"
                   placeholderTextColor="#919191"
                   style={styles.textInputStyle}
                   placeholder="Razón Social"
@@ -100,40 +109,6 @@ const BusquedaAvanzadaEmpresa = ({onSearch}) => {
               </View>
             </View>
             <View style={styles.textInput}>
-              <Text style={styles.label}>Pagina Web </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('pagina_web', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Pagina Web"
-                />
-              </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Tipo de Establecimiento </Text>
-              <View style={styles.textInputContainer}>
-                <DropDownPicker
-                  style={styles.textInputContainer}
-                  items={opciones}
-                  placeholderStyle={{color: 'gray', marginLeft: 5}}
-                  placeholder={selectedValue || 'Tipo de Establecimiento'}
-                  dropDownDirection="TOP"
-                  open={opened}
-                  onPress={() => {
-                    opened ? setOpened(false) : setOpened(true);
-                  }}
-                  onSelectItem={item => {
-                    {
-                      handleChange('tipo_de_establecimiento', item.value);
-                      setSelectedValue(item.label);
-                    }
-                  }}
-                />
-              </View>
-            </View>
-            <View style={styles.textInput}>
               <Text style={styles.label}>RFC </Text>
               <View style={styles.textInputContainer}>
                 <TextInput
@@ -145,30 +120,70 @@ const BusquedaAvanzadaEmpresa = ({onSearch}) => {
                 />
               </View>
             </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Código Postal </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('codigo_postal', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Código Postal"
-                />
+            {!shortAdvanceSearch ? (
+              <View>
+                <View style={styles.textInput}>
+                  <Text style={styles.label}>Pagina Web </Text>
+                  <View style={styles.textInputContainer}>
+                    <TextInput
+                      onChangeText={text => handleChange('pagina_web', text)}
+                      color="black"
+                      placeholderTextColor="#919191"
+                      style={styles.textInputStyle}
+                      placeholder="Pagina Web"
+                    />
+                  </View>
+                </View>
+                <View style={styles.textInput}>
+                  <Text style={styles.label}>Tipo de Establecimiento </Text>
+                  <View style={styles.textInputContainer}>
+                    <DropDownPicker
+                      style={styles.textInputContainer}
+                      items={opciones}
+                      placeholderStyle={{color: 'gray', marginLeft: 5}}
+                      placeholder={selectedValue || 'Tipo de Establecimiento'}
+                      dropDownDirection="TOP"
+                      open={opened}
+                      onPress={() => {
+                        opened ? setOpened(false) : setOpened(true);
+                      }}
+                      onSelectItem={item => {
+                        {
+                          handleChange('tipo_de_establecimiento', item.value);
+                          setSelectedValue(item.label);
+                        }
+                      }}
+                    />
+                  </View>
+                </View>
+                <View style={styles.textInput}>
+                  <Text style={styles.label}>Código Postal </Text>
+                  <View style={styles.textInputContainer}>
+                    <TextInput
+                      onChangeText={text => handleChange('codigo_postal', text)}
+                      color="black"
+                      placeholderTextColor="#919191"
+                      style={styles.textInputStyle}
+                      placeholder="Código Postal"
+                    />
+                  </View>
+                </View>
+                <View style={styles.textInput}>
+                  <Text style={styles.label}>Número Exterior </Text>
+                  <View style={styles.textInputContainer}>
+                    <TextInput
+                      onChangeText={text =>
+                        handleChange('numero_exterior', text)
+                      }
+                      color="black"
+                      placeholderTextColor="#919191"
+                      style={styles.textInputStyle}
+                      placeholder="Número Exterior"
+                    />
+                  </View>
+                </View>
               </View>
-            </View>
-            <View style={styles.textInput}>
-              <Text style={styles.label}>Número Exterior </Text>
-              <View style={styles.textInputContainer}>
-                <TextInput
-                  onChangeText={text => handleChange('numero_exterior', text)}
-                  color="black"
-                  placeholderTextColor="#919191"
-                  style={styles.textInputStyle}
-                  placeholder="Número Exterior"
-                />
-              </View>
-            </View>
+            ) : null}
             <TouchableWithoutFeedback onPress={handleSearch}>
               <View style={styles.buttonPrint}>
                 <Text style={styles.text}>Buscar</Text>

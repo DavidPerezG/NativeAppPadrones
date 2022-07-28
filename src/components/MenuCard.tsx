@@ -13,6 +13,8 @@ import {useDispatch} from 'react-redux';
 
 // External dependencies
 import {dispatchClearAuth} from '../store/actions/auth';
+import {useNotification} from './DropdownalertProvider';
+import {DropdownAlertType} from 'react-native-dropdownalert';
 
 interface IMenuCard {
   isBlank?: boolean;
@@ -39,17 +41,26 @@ const MenuCard = ({
   // Redux
   const dispatch = useDispatch();
 
-  const showAlert = (mensaje, titulo) =>
-    Alert.alert(`${titulo || 'Problema en la busqueda'}`, mensaje, [
-      {
-        text: 'Entendido',
-        style: 'cancel',
-      },
-    ]);
+  const notify = useNotification();
+
+  const showAlert = (
+    mensaje?: string,
+    titulo?: string,
+    type?: DropdownAlertType,
+  ) =>
+    notify({
+      type: type || 'error',
+      title: titulo || 'Problema en la busqueda',
+      message: mensaje || '',
+    });
 
   const handleClick = () => {
     if (unable === true) {
-      showAlert('Disculpa la molestia', 'En Desarrollo');
+      showAlert(
+        'Disculpa la molestia',
+        'Funcionalidad en Mantenimiento',
+        'info',
+      );
     } else {
       if (navPage === 'cargosPadrones') {
         global.padronSeleccionado = nombreItem;

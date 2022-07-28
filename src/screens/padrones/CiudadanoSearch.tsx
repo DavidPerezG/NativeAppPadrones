@@ -15,69 +15,63 @@ import ParamsListRowButtons from '../../components/padronesSearchComponents/Para
 import ModalSeleccionar from '../../components/padronesSearchComponents/ModalSeleccionar';
 
 // Services
-import {getAgencias, deleteAgencia} from '../../services/empresas/agencias';
-import {getAlcoholes, deleteAlcohol} from '../../services/empresas/alcoholes';
 import {
-  getArrendamientos,
-  deleteArrendamiento,
-} from '../../services/empresas/arrendamientos';
-
-import {
-  getCasasDeEmpenio,
-  deleteCasaDeEmpenio,
-} from '../../services/empresas/casasDeEmpenio';
-import {getCedulares, deleteCedular} from '../../services/empresas/cedulares';
-import {getEmpresas, deleteEmpresas} from '../../services/empresas/empresas';
-import {
-  getHospedajes,
-  deleteHospedaje,
-} from '../../services/empresas/hospedajes';
-import {
-  deleteJuegoDeAzar,
-  getJuegosDeAzar,
-} from '../../services/empresas/juegosDeAzar';
-import {getNominas, deleteNomina} from '../../services/empresas/nominas';
-import {getNotarios, deleteNotario} from '../../services/empresas/notarios';
+  getCiudadanos,
+  deleteCiudadano,
+} from '../../services/cuentaunicasir/ciudadanos';
 
 // Types
-import {Empresa} from '../../types/empresaInterface';
+import {Ciudadano} from '../../types/ciudadanoInterface';
 import {DropdownAlertType} from 'react-native-dropdownalert';
 import {Option} from '../../types/option';
 
-const parametrosEmpresa = {
-  razon_social: {
-    label_text: 'Razón Social',
-    param_name: 'razon_social',
+const parametrosCiudadano = {
+  clave_ciudadana: {
+    label_text: 'Clave Ciudadana',
+    param_name: 'clave_ciudadana',
   },
-  nombre_comercial: {
-    label_text: 'Nombre Comercial',
-    param_name: 'nombre_comercial',
+  email: {
+    label_text: 'Email',
+    param_name: 'email',
   },
-  RFC: {
-    label_text: 'RFC',
-    param_name: 'RFC',
+  first_name: {
+    label_text: 'Nombre',
+    param_name: 'first_name',
+  },
+  last_name: {
+    label_text: 'Apellido Paterno',
+    param_name: 'last_name',
+  },
+  second_last_name: {
+    label_text: 'Apellido Materno',
+    param_name: 'second_last_name',
   },
 };
 
-type ParamsEmpresa = 'razon_social' | 'nombre_comercial' | 'RFC';
+type ParamsCiudadano =
+  | 'clave_ciudadana'
+  | 'email'
+  | 'first_name'
+  | 'last_name'
+  | 'second_last_name';
 type SortingBy = 'ascending' | 'descending' | 'id';
 
-const AgenciasSearch = () => {
+const CiudadanosSearch = () => {
   //QUESTION el delete de agencia no lo elimina de la base de datos solo me da un get de la info
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState<boolean>(false);
   const [sortingBy, setSortingBy] = useState<SortingBy>('id');
   const [selectedOption, setSelectedOption] = useState();
-  const [listAgencias, setListAgencias] = useState<Array<Empresa>>();
+  const [listCiudadanos, setListCiudadanos] = useState<Array<Ciudadano>>();
   const [parametroPadron, setParametroPadron] =
-    useState<ParamsEmpresa>('razon_social');
+    useState<ParamsCiudadano>('email');
 
   const notify = useNotification();
   const navigation = useNavigation();
 
   const currentPage = useRef<number>(1);
-  const searchForm = useRef<Empresa>();
+  const searchForm = useRef<Ciudadano>();
 
   // useEffect con validación de conexión estable
   useEffect(() => {
@@ -107,8 +101,8 @@ const AgenciasSearch = () => {
   // funcion cuando hay una nueva busqueda, inicializa variable de listado y verifica si se utilizo la busqueda avanzada
   const onSearch = (searchText: string, form: object) => {
     setIsLoading(true);
-    let emptyAgencia: Empresa = {};
-    searchForm.current = emptyAgencia;
+    let emptyCiudadano: Ciudadano = {};
+    searchForm.current = emptyCiudadano;
     searchForm.current[parametroPadron] = searchText;
     if (form) {
       searchForm.current = form;
@@ -123,25 +117,18 @@ const AgenciasSearch = () => {
       setIsLoading(false);
     } else {
       currentPage.current = 1;
-      searchAgencia();
+      searchCiudadano();
     }
   };
 
   //funcion para buscar agencia o continuar con la paginacion
-  const searchAgencia = async () => {
+  const searchCiudadano = async () => {
+    console.log('buscarndo');
     setIsLoading(true);
     let response;
-    let razon_social = searchForm.current?.razon_social;
-    let nombre_comercial = searchForm.current?.nombre_comercial;
-    let RFC = searchForm.current?.RFC;
-    response = await getAgencias(
-      razon_social,
-      nombre_comercial,
-      RFC,
-      currentPage.current,
-    );
+    response = await getCiudadanos(searchForm.current, currentPage.current);
     if (response) {
-      setNewAgencias(response.results);
+      setNewCiudadanos(response.results);
     } else {
       showAlert('', 'No hay mas datos a mostrar', 'info');
       setIsLoading(false);
@@ -149,37 +136,35 @@ const AgenciasSearch = () => {
   };
 
   // Listar los nuevos datos encontrados
-  const setNewAgencias = response => {
-    let newData = listAgencias;
+  const setNewCiudadanos = response => {
+    let newData = listCiudadanos;
     currentPage.current === 1
       ? (newData = response)
-      : response.map(item => {
-          newData = [...newData!, item];
-        });
+      : response.map(item => (newData = [...newData, item]));
+
     currentPage.current++;
     setIsLoading(false);
     sortList('id');
-    setListAgencias(newData);
+    setListCiudadanos(newData);
   };
 
   // Elimina un dato listado en la busqueda encontrada
   const deleteRow = async rowKey => {
-    const newData = [...listAgencias!];
-    const prevIndex = listAgencias!.findIndex(padron => padron.id === rowKey);
-    let response = await deleteAgencia(rowKey);
-    console.log(response);
+    const newData = [...listCiudadanos!];
+    const prevIndex = listCiudadanos!.findIndex(padron => padron.id === rowKey);
+    let response = await deleteCiudadano(rowKey);
     newData.splice(prevIndex!, 1);
 
-    setListAgencias(newData);
+    setListCiudadanos(newData);
   };
 
   // Crea las opciones listadas y a poder escoger dentro del modal <ModalSeleccionar />
   const createOptions = (): Array<Option> => {
     let options: Array<Option> = [];
-    for (let param in parametrosEmpresa) {
+    for (let param in parametrosCiudadano) {
       let option: Option = {
-        label: parametrosEmpresa[param].label_text,
-        value: parametrosEmpresa[param].param_name,
+        label: parametrosCiudadano[param].label_text,
+        value: parametrosCiudadano[param].param_name,
       };
       options.push(option);
     }
@@ -199,7 +184,7 @@ const AgenciasSearch = () => {
   };
 
   const sortList = (value: SortingBy) => {
-    if (listAgencias) {
+    if (listCiudadanos) {
       console.log(sortingBy);
       value === 'ascending' ? sortListAscending() : null;
       value === 'descending' ? sortListDescending() : null;
@@ -211,49 +196,49 @@ const AgenciasSearch = () => {
   useEffect(() => {}, [sortingBy]);
 
   const sortListAscending = () => {
-    const sortedAgencias = listAgencias!.sort(function (a, b) {
+    const sortedList = listCiudadanos!.sort(function (a, b) {
       return a[parametroPadron].localeCompare(b[parametroPadron]);
     });
 
-    setListAgencias(sortedAgencias);
+    setListCiudadanos(sortedList);
   };
 
   const sortListDescending = () => {
-    const sortedAgencias = listAgencias!
+    const sortedList = listCiudadanos!
       .sort(function (a, b) {
         return a[parametroPadron].localeCompare(b[parametroPadron]);
       })
       .reverse();
 
-    setListAgencias(sortedAgencias);
+    setListCiudadanos(sortedList);
   };
 
   const sortListById = () => {
-    const sortedAgencias = listAgencias!.sort(function (a, b) {
+    const sortedList = listCiudadanos!.sort(function (a, b) {
       return a.id - b.id;
     });
 
-    setListAgencias(sortedAgencias);
+    setListCiudadanos(sortedList);
   };
 
   return (
     <>
       <Container>
         <Header
-          title="Agencias"
+          title="Ciudadanos"
           isGoBack
           onPressLeftButton={() => navigation.goBack()}
         />
         <TopContainer>
           <SearchInput
-            placeholderText="Buscar Agencia..."
-            advanceSearch="Empresa"
+            placeholderText="Buscar Ciudadano..."
+            advanceSearch="Ciudadano"
             loading={isLoading}
             onSearch={onSearch}
           />
           <Linepx />
           <ParamsListRowButtons
-            labelText={parametrosEmpresa[parametroPadron].label_text}
+            labelText={parametrosCiudadano[parametroPadron].label_text}
             onDownPressed={() => sortList('descending')}
             onUpPressed={() => sortList('ascending')}
             onParamPressed={() => setIsOpen(true)}
@@ -261,19 +246,25 @@ const AgenciasSearch = () => {
           />
         </TopContainer>
         <SwipeListContainer
-          data={listAgencias}
+          data={listCiudadanos}
           extraData={sortingBy}
           parameterToList={parametroPadron}
           onDelete={rowKey => {
             setSelectedOption(rowKey);
             setIsOpenDelete(true);
           }}
-          onEndReached={searchAgencia}
+          onEndReached={searchCiudadano}
         />
         <FloatingButton>
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => console.log(listAgencias?.length)}>
+            onPress={() =>
+              showAlert(
+                'Disculpa la molestia',
+                'Funcionalidad en Mantenimiento',
+                'info',
+              )
+            }>
             <FontAwesome5 name={'plus'} size={35} solid color={'#fff'} />
           </TouchableOpacity>
         </FloatingButton>
@@ -334,4 +325,4 @@ const FloatingButton = styled.View`
   elevation: 10;
 `;
 
-export default AgenciasSearch;
+export default CiudadanosSearch;

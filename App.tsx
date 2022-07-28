@@ -27,6 +27,17 @@ import RecibosDeCaja from './src/screens/RecibosDeCaja';
 import PreviewPDF from './src/screens/PreviewPDF';
 import ListadoPadrones from './src/screens/ListadoPadrones';
 import AgenciasSearch from './src/screens/padrones/AgenciasSearch';
+import AlcoholesSearch from './src/screens/padrones/AlcoholesSearch';
+import NominasSearch from './src/screens/padrones/NominasSearch';
+import HospedajesSearch from './src/screens/padrones/HospedajesSearch';
+import EmpresasSearch from './src/screens/padrones/EmpresasSearch';
+import ArrendamientosSearch from './src/screens/padrones/ArrendamientosSearch';
+import CedularesSearch from './src/screens/padrones/CedularesSearch';
+import NotariosSearch from './src/screens/padrones/NotariosSearch';
+import CasasDeEmpenioSearch from './src/screens/padrones/CasasDeEmpenioSearch';
+import JuegosDeAzarSearch from './src/screens/padrones/JuegosDeAzarSearch';
+import VehiculosSearch from './src/screens/padrones/VehiculosSearch';
+import CiudadanosSearch from './src/screens/padrones/CiudadanoSearch';
 
 import DropdownalertProvider from './src/components/DropdownalertProvider';
 
@@ -58,6 +69,26 @@ const AppContainer = () => (
       <Stack.Screen name="preview-pdf" component={PreviewPDF} />
       <Stack.Screen name="listado-padrones" component={ListadoPadrones} />
       <Stack.Screen name="agencias-search" component={AgenciasSearch} />
+      <Stack.Screen name="alcoholes-search" component={AlcoholesSearch} />
+      <Stack.Screen name="nominas-search" component={NominasSearch} />
+      <Stack.Screen name="hospedajes-search" component={HospedajesSearch} />
+      <Stack.Screen name="empresas-search" component={EmpresasSearch} />
+      <Stack.Screen
+        name="arrendamientos-search"
+        component={ArrendamientosSearch}
+      />
+      <Stack.Screen name="cedulares-search" component={CedularesSearch} />
+      <Stack.Screen name="notarios-search" component={NotariosSearch} />
+      <Stack.Screen
+        name="casas-de-empenio-search"
+        component={CasasDeEmpenioSearch}
+      />
+      <Stack.Screen
+        name="juegos-de-azar-search"
+        component={JuegosDeAzarSearch}
+      />
+      <Stack.Screen name="vehiculos-search" component={VehiculosSearch} />
+      <Stack.Screen name="ciudadanos-search" component={CiudadanosSearch} />
     </Stack.Navigator>
   </NavigationContainer>
 );

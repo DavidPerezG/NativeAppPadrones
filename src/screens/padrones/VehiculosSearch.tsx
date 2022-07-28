@@ -15,69 +15,91 @@ import ParamsListRowButtons from '../../components/padronesSearchComponents/Para
 import ModalSeleccionar from '../../components/padronesSearchComponents/ModalSeleccionar';
 
 // Services
-import {getAgencias, deleteAgencia} from '../../services/empresas/agencias';
-import {getAlcoholes, deleteAlcohol} from '../../services/empresas/alcoholes';
 import {
-  getArrendamientos,
-  deleteArrendamiento,
-} from '../../services/empresas/arrendamientos';
-
-import {
-  getCasasDeEmpenio,
-  deleteCasaDeEmpenio,
-} from '../../services/empresas/casasDeEmpenio';
-import {getCedulares, deleteCedular} from '../../services/empresas/cedulares';
-import {getEmpresas, deleteEmpresas} from '../../services/empresas/empresas';
-import {
-  getHospedajes,
-  deleteHospedaje,
-} from '../../services/empresas/hospedajes';
-import {
-  deleteJuegoDeAzar,
-  getJuegosDeAzar,
-} from '../../services/empresas/juegosDeAzar';
-import {getNominas, deleteNomina} from '../../services/empresas/nominas';
-import {getNotarios, deleteNotario} from '../../services/empresas/notarios';
+  getVehiculo,
+  deleteVehiculo,
+  getEstadosVehiculo,
+  getMarcasVehiculo,
+  getServiciosVehiculo,
+  getTiposVehiculo,
+} from '../../services/recaudacion/vehiculos';
 
 // Types
-import {Empresa} from '../../types/empresaInterface';
+import {Vehiculo} from '../../types/vehiculoInterface';
+import {ServicioVehiculo} from '../../types/serviciosVehiculoInterface';
+import {EstadoVehiculo} from '../../types/estadoVehiculoInterface';
+import {TipoVehiculo} from '../../types/tipoVehiculoInterface';
 import {DropdownAlertType} from 'react-native-dropdownalert';
 import {Option} from '../../types/option';
 
-const parametrosEmpresa = {
-  razon_social: {
-    label_text: 'Razón Social',
-    param_name: 'razon_social',
+const parametrosVehiculo = {
+  numero_de_placa: {
+    label_text: 'No. de Placa',
+    param_name: 'numero_de_placa',
   },
-  nombre_comercial: {
-    label_text: 'Nombre Comercial',
-    param_name: 'nombre_comercial',
+  serie: {
+    label_text: 'Serie',
+    param_name: 'serie',
   },
-  RFC: {
-    label_text: 'RFC',
-    param_name: 'RFC',
+  modelo_del_vehiculo: {
+    label_text: 'Modelo del Vehículo',
+    param_name: 'modelo_del_vehiculo',
+  },
+  tarjeta_de_circulacion: {
+    label_text: 'Tarjeta de Circulación',
+    param_name: 'tarjeta_de_circulacion',
+  },
+  clave_vehicular: {
+    label_text: 'Clave Vehicular',
+    param_name: 'clave_vehicular',
+  },
+  servicio: {
+    label_text: 'Servicio',
+    param_name: 'servicio',
+  },
+  estatus_del_vehiculo: {
+    label_text: 'Estatus del Vehículo',
+    param_name: 'estatus_del_vehiculo',
+  },
+  tipo_de_vehiculo: {
+    label_text: 'Tipo de Vehiculo',
+    param_name: 'tipo_de_vehiculo',
   },
 };
 
-type ParamsEmpresa = 'razon_social' | 'nombre_comercial' | 'RFC';
+type ParamsVehiculo =
+  | 'numero_de_placa'
+  | 'serie'
+  | 'modelo_del_vehiculo'
+  | 'tarjeta_de_circulacion'
+  | 'clave_vehicular'
+  | 'servicio'
+  | 'estatus_del_vehiculo'
+  | 'tipo_de_vehiculo';
 type SortingBy = 'ascending' | 'descending' | 'id';
 
-const AgenciasSearch = () => {
+const VehiculosSearch = () => {
   //QUESTION el delete de agencia no lo elimina de la base de datos solo me da un get de la info
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isOpenDelete, setIsOpenDelete] = useState<boolean>(false);
   const [sortingBy, setSortingBy] = useState<SortingBy>('id');
   const [selectedOption, setSelectedOption] = useState();
-  const [listAgencias, setListAgencias] = useState<Array<Empresa>>();
+  const [listVehiculos, setListVehiculos] = useState<Array<Vehiculo>>();
   const [parametroPadron, setParametroPadron] =
-    useState<ParamsEmpresa>('razon_social');
+    useState<ParamsVehiculo>('numero_de_placa');
+
+  const [estadosVehiculo, setEstadosVehiculo] =
+    useState<Array<EstadoVehiculo>>();
+  const [serviciosVehiculos, setServiciosVehiculos] =
+    useState<Array<ServicioVehiculo>>();
+  const [tiposVehiculos, setTiposVehiculos] = useState<Array<TipoVehiculo>>();
 
   const notify = useNotification();
   const navigation = useNavigation();
 
   const currentPage = useRef<number>(1);
-  const searchForm = useRef<Empresa>();
+  const searchForm = useRef<Vehiculo>();
 
   // useEffect con validación de conexión estable
   useEffect(() => {
@@ -86,6 +108,10 @@ const AgenciasSearch = () => {
         ? showAlert('Verifique si su conexión es estable', 'Error de Conexión')
         : null;
     });
+
+    getServicios();
+    getEstados();
+    getTipos();
 
     return () => {
       unsubscribe();
@@ -107,8 +133,8 @@ const AgenciasSearch = () => {
   // funcion cuando hay una nueva busqueda, inicializa variable de listado y verifica si se utilizo la busqueda avanzada
   const onSearch = (searchText: string, form: object) => {
     setIsLoading(true);
-    let emptyAgencia: Empresa = {};
-    searchForm.current = emptyAgencia;
+    let emptyVehiculo: Vehiculo = {};
+    searchForm.current = emptyVehiculo;
     searchForm.current[parametroPadron] = searchText;
     if (form) {
       searchForm.current = form;
@@ -123,25 +149,18 @@ const AgenciasSearch = () => {
       setIsLoading(false);
     } else {
       currentPage.current = 1;
-      searchAgencia();
+      searchVehiculo();
     }
   };
 
   //funcion para buscar agencia o continuar con la paginacion
-  const searchAgencia = async () => {
+  const searchVehiculo = async () => {
     setIsLoading(true);
     let response;
-    let razon_social = searchForm.current?.razon_social;
-    let nombre_comercial = searchForm.current?.nombre_comercial;
-    let RFC = searchForm.current?.RFC;
-    response = await getAgencias(
-      razon_social,
-      nombre_comercial,
-      RFC,
-      currentPage.current,
-    );
+    response = await getVehiculo(searchForm.current, currentPage.current);
     if (response) {
-      setNewAgencias(response.results);
+      let convertedResponse = completeData(response.results);
+      setNewVehiculo(convertedResponse);
     } else {
       showAlert('', 'No hay mas datos a mostrar', 'info');
       setIsLoading(false);
@@ -149,37 +168,79 @@ const AgenciasSearch = () => {
   };
 
   // Listar los nuevos datos encontrados
-  const setNewAgencias = response => {
-    let newData = listAgencias;
+  const setNewVehiculo = response => {
+    let newData = listVehiculos;
     currentPage.current === 1
       ? (newData = response)
-      : response.map(item => {
-          newData = [...newData!, item];
-        });
+      : response.map(item => (newData = [...newData, item]));
+
     currentPage.current++;
     setIsLoading(false);
     sortList('id');
-    setListAgencias(newData);
+    setListVehiculos(newData);
+  };
+
+  //Sustituye los valores de algunos parametros tomando el numero de id y sustituyendolo por el nombre
+  const completeData = data => {
+    let newData = data.map((element: Vehiculo) => {
+      let servicio: ServicioVehiculo | undefined;
+      serviciosVehiculos &&
+        (servicio = serviciosVehiculos.find(el => el.id === element.servicio));
+      servicio && (element.servicio = servicio.nombre);
+
+      let estado: EstadoVehiculo | undefined;
+      estadosVehiculo &&
+        (estado = estadosVehiculo.find(
+          el => el.id === element.estatus_del_vehiculo,
+        ));
+      estado && (element.estatus_del_vehiculo = estado.nombre);
+
+      let tipo: TipoVehiculo | undefined;
+      tiposVehiculos &&
+        (tipo = tiposVehiculos.find(el => el.id === element.tipo_de_vehiculo));
+      tipo && (element.tipo_de_vehiculo = tipo.nombre);
+      return element;
+    });
+    return newData;
+  };
+
+  const getMarcas = async () => {
+    let response = await getMarcasVehiculo();
+    return response;
+  };
+
+  const getEstados = async () => {
+    let response = await getEstadosVehiculo();
+    setEstadosVehiculo(response);
+  };
+
+  const getServicios = async () => {
+    let response = await getServiciosVehiculo();
+    setServiciosVehiculos(response);
+  };
+
+  const getTipos = async () => {
+    let response = await getTiposVehiculo();
+    setTiposVehiculos(response);
   };
 
   // Elimina un dato listado en la busqueda encontrada
   const deleteRow = async rowKey => {
-    const newData = [...listAgencias!];
-    const prevIndex = listAgencias!.findIndex(padron => padron.id === rowKey);
-    let response = await deleteAgencia(rowKey);
-    console.log(response);
+    const newData = [...listVehiculos!];
+    const prevIndex = listVehiculos!.findIndex(padron => padron.id === rowKey);
+    let response = await deleteVehiculo(rowKey);
     newData.splice(prevIndex!, 1);
 
-    setListAgencias(newData);
+    setListVehiculos(newData);
   };
 
   // Crea las opciones listadas y a poder escoger dentro del modal <ModalSeleccionar />
   const createOptions = (): Array<Option> => {
     let options: Array<Option> = [];
-    for (let param in parametrosEmpresa) {
+    for (let param in parametrosVehiculo) {
       let option: Option = {
-        label: parametrosEmpresa[param].label_text,
-        value: parametrosEmpresa[param].param_name,
+        label: parametrosVehiculo[param].label_text,
+        value: parametrosVehiculo[param].param_name,
       };
       options.push(option);
     }
@@ -199,7 +260,7 @@ const AgenciasSearch = () => {
   };
 
   const sortList = (value: SortingBy) => {
-    if (listAgencias) {
+    if (listVehiculos) {
       console.log(sortingBy);
       value === 'ascending' ? sortListAscending() : null;
       value === 'descending' ? sortListDescending() : null;
@@ -211,49 +272,49 @@ const AgenciasSearch = () => {
   useEffect(() => {}, [sortingBy]);
 
   const sortListAscending = () => {
-    const sortedAgencias = listAgencias!.sort(function (a, b) {
+    const sortedList = listVehiculos!.sort(function (a, b) {
       return a[parametroPadron].localeCompare(b[parametroPadron]);
     });
 
-    setListAgencias(sortedAgencias);
+    setListVehiculos(sortedList);
   };
 
   const sortListDescending = () => {
-    const sortedAgencias = listAgencias!
+    const sortedList = listVehiculos!
       .sort(function (a, b) {
         return a[parametroPadron].localeCompare(b[parametroPadron]);
       })
       .reverse();
 
-    setListAgencias(sortedAgencias);
+    setListVehiculos(sortedList);
   };
 
   const sortListById = () => {
-    const sortedAgencias = listAgencias!.sort(function (a, b) {
+    const sortedList = listVehiculos!.sort(function (a, b) {
       return a.id - b.id;
     });
 
-    setListAgencias(sortedAgencias);
+    setListVehiculos(sortedList);
   };
 
   return (
     <>
       <Container>
         <Header
-          title="Agencias"
+          title="Vehiculos"
           isGoBack
           onPressLeftButton={() => navigation.goBack()}
         />
         <TopContainer>
           <SearchInput
-            placeholderText="Buscar Agencia..."
-            advanceSearch="Empresa"
+            placeholderText="Buscar Vehiculo..."
+            advanceSearch="Vehiculo"
             loading={isLoading}
             onSearch={onSearch}
           />
           <Linepx />
           <ParamsListRowButtons
-            labelText={parametrosEmpresa[parametroPadron].label_text}
+            labelText={parametrosVehiculo[parametroPadron].label_text}
             onDownPressed={() => sortList('descending')}
             onUpPressed={() => sortList('ascending')}
             onParamPressed={() => setIsOpen(true)}
@@ -261,19 +322,26 @@ const AgenciasSearch = () => {
           />
         </TopContainer>
         <SwipeListContainer
-          data={listAgencias}
+          data={listVehiculos}
           extraData={sortingBy}
           parameterToList={parametroPadron}
           onDelete={rowKey => {
             setSelectedOption(rowKey);
             setIsOpenDelete(true);
           }}
-          onEndReached={searchAgencia}
+          onEndReached={searchVehiculo}
         />
         <FloatingButton>
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => console.log(listAgencias?.length)}>
+            onPress={() =>
+              // showAlert(
+              //   'Disculpa la molestia',
+              //   'Funcionalidad en Mantenimiento',
+              //   'info',
+              // )
+              getMarcas
+            }>
             <FontAwesome5 name={'plus'} size={35} solid color={'#fff'} />
           </TouchableOpacity>
         </FloatingButton>
@@ -334,4 +402,4 @@ const FloatingButton = styled.View`
   elevation: 10;
 `;
 
-export default AgenciasSearch;
+export default VehiculosSearch;

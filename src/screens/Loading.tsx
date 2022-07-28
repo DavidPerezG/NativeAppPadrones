@@ -18,6 +18,7 @@ const LoadingScreen = () => {
   const dispatch = useDispatch();
   // @ts-ignore
   const isAuthenticated = useSelector(state => Boolean(state.auth.access));
+
   // @ts-ignore
   const refresh = useSelector(state => state.auth.refresh);
 

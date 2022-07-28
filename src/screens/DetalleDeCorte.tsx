@@ -15,6 +15,8 @@ import Header from '../components/Header';
 import {cerrarCorte, TMetodosDePagoProps} from '../services/recaudacion';
 import {getMetodosDePago} from '../services/configuracion';
 import {dispatchSetCorte} from '../store/actions/user';
+import {getUserInfo} from '../services/user';
+import {dispatchSetUserInfo} from '../store/actions/user';
 
 // Interfaces & Types
 type DetalleDeCorteScreenNavigationProps = NativeStackNavigationProp<
@@ -50,6 +52,16 @@ const DetalleDeCorteScreen = () => {
     return parsedNumber;
   };
 
+  const setUserInfo = async () => {
+    const userInfo = await getUserInfo();
+
+    if (userInfo) {
+      dispatchSetUserInfo(dispatch, userInfo);
+
+      return;
+    }
+  };
+
   const onSubmit = async () => {
     setLoading(true);
     const regexpIsFloatOrInt = /^[0-9]*\.?[0-9]*$/;
@@ -82,8 +94,10 @@ const DetalleDeCorteScreen = () => {
         metodo_de_pago: idDebito,
       },
     ];
-
     const isClosed = await cerrarCorte(corte.id, paymentMethods);
+    setUserInfo();
+    console.log('isClosed');
+    console.log(isClosed);
     if (isClosed) {
       dispatchSetCorte(dispatch, null);
       navigation.goBack();
@@ -120,15 +134,27 @@ const DetalleDeCorteScreen = () => {
   // Effects
   useEffect(() => {
     fetchData();
+    return () => {
+      console.log('hola');
+    };
   }, []);
-
   return (
     <>
       <Container>
         <Header
           title="Cerrar corte"
           isGoBack
-          onPressLeftButton={() => navigation.goBack()}
+          onPressLeftButton={() =>
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  // @ts-ignore
+                  name: 'menu',
+                },
+              ],
+            })
+          }
           disableLeftButton={loading}
         />
 

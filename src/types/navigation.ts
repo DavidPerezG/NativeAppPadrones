@@ -19,4 +19,15 @@ export type RootStackParamList = {
   'preview-pdf': undefined;
   'listado-padrones': undefined;
   'agencias-search': undefined;
+  'alcoholes-search': undefined;
+  'nominas-search': undefined;
+  'hospedajes-search': undefined;
+  'empresas-search': undefined;
+  'arrendamientos-search': undefined;
+  'cedulares-search': undefined;
+  'notarios-search': undefined;
+  'casas-de-empenio-search': undefined;
+  'juegos-de-azar-search': undefined;
+  'vehiculos-search': undefined;
+  'ciudadanos-search': undefined;
 };

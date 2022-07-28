@@ -7,31 +7,44 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import Collapsible from 'react-native-collapsible';
+import styled from 'styled-components/native';
 import fonts from '../utils/fonts';
 
 interface IDropDownButton {
   leftText?: string;
   rightText?: string;
+  collapsable?: boolean;
   children?: JSX.Element;
 }
 
-const DropdownButton = ({leftText, rightText, children}: IDropDownButton) => {
-  const [isCollapsable, setIsCollapsable] = useState(true);
+const DropdownButton = ({
+  leftText,
+  rightText,
+  collapsable,
+  children,
+}: IDropDownButton) => {
+  const [isCollapsable, setIsCollapsable] = useState<boolean>(
+    collapsable || true,
+  );
 
   useEffect(() => {}, []);
 
   const handleClick = () => {
-    if (isCollapsable === true) {
-      setIsCollapsable(false);
+    if (collapsable === true) {
+      if (isCollapsable === true) {
+        setIsCollapsable(false);
+      } else {
+        setIsCollapsable(true);
+      }
     } else {
-      setIsCollapsable(true);
+      return;
     }
   };
 
   return (
     <>
       <TouchableWithoutFeedback onPress={() => handleClick()}>
-        <View style={styles.card}>
+        <Card>
           <View style={styles.row}>
             <Text numberOfLines={1} style={styles.text}>
               {leftText?.length < 40
@@ -40,7 +53,7 @@ const DropdownButton = ({leftText, rightText, children}: IDropDownButton) => {
             </Text>
             <Text style={styles.text}>{rightText}</Text>
           </View>
-        </View>
+        </Card>
       </TouchableWithoutFeedback>
       <Collapsible collapsed={isCollapsable}>
         <View style={styles.childrenCard}>{children}</View>
@@ -52,18 +65,6 @@ const DropdownButton = ({leftText, rightText, children}: IDropDownButton) => {
 export default DropdownButton;
 
 const styles = StyleSheet.create({
-  card: {
-    width: Dimensions.get('window').width * 0.85,
-    height: 53,
-    paddingHorizontal: 15,
-    borderRadius: 10,
-    flexDirection: 'column',
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    elevation: 3,
-    marginBottom: 6,
-  },
   childrenCard: {
     width: Dimensions.get('window').width * 0.85,
     paddingHorizontal: 15,
@@ -92,3 +93,16 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 });
+
+const Card = styled.View`
+  width: ${Dimensions.get('window').width * 0.9};
+  height: 53px;
+  padding-horizontal: 15px;
+  border-radius: 10px;
+  flex-direction: column;
+  background-color: #ffffff;
+  align-items: center;
+  justify-content: space-between;
+  elevation: 3;
+  margin-bottom: 6px;
+`;

@@ -54,7 +54,7 @@ const SearchInput = ({placeholderText, onSearch, advanceSearch, loading}) => {
         <BusquedaAvanzadaCiudadano onSearch={handleSearch} />
       ) : null}
       {advanceSearch === 'Empresa' ? (
-        <BusquedaAvanzadaEmpresa onSearch={handleSearch} />
+        <BusquedaAvanzadaEmpresa onSearch={handleSearch} shortAdvanceSearch />
       ) : null}
       {advanceSearch === 'Predio' ? (
         <BusquedaAvanzadaPredio onSearch={handleSearch} />
