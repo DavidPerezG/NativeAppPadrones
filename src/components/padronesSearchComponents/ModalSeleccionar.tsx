@@ -92,8 +92,8 @@ const BehindModal = styled.View`
 
 const ModalView = styled.View`
   background-color: white;
-  max-height: ${Dimensions.get('window').height * 0.5};
-  width: ${Dimensions.get('window').width * 0.9};
+  max-height: ${Dimensions.get('window').height * 0.5}px;
+  width: ${Dimensions.get('window').width * 0.9}px;
   align-items: center;
   border-radius: 10px;
   padding-vertical: 10px;
@@ -101,7 +101,7 @@ const ModalView = styled.View`
 
 const ButtonOption = styled.View`
   background-color: white;
-  width: ${Dimensions.get('window').width * 0.85};
+  width: ${Dimensions.get('window').width * 0.85}px;
   border-radius: 10px;
   border-width: 0.5px;
   margin-vertical: 2px;
@@ -110,7 +110,7 @@ const ButtonOption = styled.View`
 
 const ButtonClose = styled.View`
   background-color: #79142a;
-  width: ${Dimensions.get('window').width * 0.85};
+  width: ${Dimensions.get('window').width * 0.85}px;
   border-radius: 10px;
   border-color: gray;
   border-width: 0.6px;

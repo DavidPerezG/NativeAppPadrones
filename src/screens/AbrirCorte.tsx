@@ -37,6 +37,9 @@ const AbrirCorteScreen = () => {
   // Effects
   useEffect(() => {
     fetchUnidades();
+    return () => {
+      setUnidadDeRecaudacion(undefined);
+    };
   }, []);
 
   const showAlert = (mensaje, titulo) =>

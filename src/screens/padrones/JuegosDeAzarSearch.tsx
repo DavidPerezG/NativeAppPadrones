@@ -70,6 +70,7 @@ const JuegosDeAzarSearch = () => {
 
     return () => {
       unsubscribe();
+      setListEmpresas([]);
     };
   }, []);
 

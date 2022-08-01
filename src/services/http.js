@@ -7,8 +7,8 @@ import {navigateWithReset} from '../utils/navigation';
 
 // Configuration
 export const API_SCHEMA = 'https';
-//export const API_HOST = 'apigrp.migob.mx/';
-export const API_HOST = 'apiingresosnayarit.migob.mx';
+export const API_HOST = 'apigrp.migob.mx/';
+//export const API_HOST = 'apiingresosnayarit.migob.mx';
 export const API_PATH = '/';
 
 export const httpConfig = {

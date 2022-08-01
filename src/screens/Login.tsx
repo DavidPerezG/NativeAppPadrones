@@ -12,11 +12,14 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {useDispatch} from 'react-redux';
+import NetInfo from '@react-native-community/netinfo';
+import {DropdownAlertType} from 'react-native-dropdownalert';
 
 // Internal dependencies
 import ModalMessage from '../components/ModalMessage';
 import {login} from '../services/auth';
 import {dispatchClearAuth, dispatchLogin} from '../store/actions/auth';
+import {useNotification} from '../components/DropdownalertProvider';
 
 const Login = () => {
   // Component's state
@@ -32,11 +35,34 @@ const Login = () => {
   // Navigation
   const navigation = useNavigation();
 
+  // Notification
+  const notify = useNotification();
+
   // Effects
   useEffect(() => {
     dispatchClearAuth(dispatch);
+    const unsubscribe = NetInfo.addEventListener(state => {
+      !state.isConnected
+        ? showAlert('Verifique si su conexión es estable', 'Error de Conexión')
+        : null;
+    });
+
+    return () => {
+      unsubscribe();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const showAlert = (
+    mensaje?: string,
+    titulo?: string,
+    type?: DropdownAlertType,
+  ) =>
+    notify({
+      type: type || 'error',
+      title: titulo || 'Problema en la busqueda',
+      message: mensaje || '',
+    });
 
   /**
    * Handle the login button press

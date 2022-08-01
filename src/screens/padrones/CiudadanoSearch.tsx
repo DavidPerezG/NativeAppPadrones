@@ -83,6 +83,7 @@ const CiudadanosSearch = () => {
 
     return () => {
       unsubscribe();
+      setListCiudadanos([]);
     };
   }, []);
 

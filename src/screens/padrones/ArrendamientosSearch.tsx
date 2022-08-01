@@ -70,6 +70,7 @@ const ArrendamientoSearch = () => {
 
     return () => {
       unsubscribe();
+      setListEmpresas([]);
     };
   }, []);
 

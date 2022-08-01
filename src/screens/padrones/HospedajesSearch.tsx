@@ -70,6 +70,7 @@ const HospedajesSearch = () => {
 
     return () => {
       unsubscribe();
+      setListEmpresas([]);
     };
   }, []);
 

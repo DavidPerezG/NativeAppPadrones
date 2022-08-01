@@ -46,21 +46,23 @@ import {
 //Types & Interfaces
 import {Cargo} from '../types/cargoInterface';
 import {Ciudadano} from '../types/ciudadanoInterface';
+import {getContribuyenteCaja} from '../services/empresas/contribuyentesCaja';
 
 const datosExtraPadrones = {
   Ciudadano: {numero: 1, variableDeNombre: 'nombre_completo'},
-  Empresa: {numero: 2, variableDeNombre: 'razon_social'},
+  Empresa: {numero: 2, variableDeNombre: 'nombre_comercial'},
   Predio: {numero: 3, variableDeNombre: 'descripcion'},
   Vehiculo: {numero: 4, variableDeNombre: 'id'},
   Hospedaje: {numero: 6, variableDeNombre: 'razon_social'},
   Arrendamiento: {numero: 7, variableDeNombre: 'razon_social'},
-  Nomina: {numero: 8, variableDeNombre: 'razon_social'},
+  Nomina: {numero: 8, variableDeNombre: 'clave'},
   Alcohol: {numero: 9, variableDeNombre: 'razon_social'},
   cedular: {numero: 10, variableDeNombre: 'razon_social'},
   'Juego De Azar': {numero: 11, variableDeNombre: 'razon_social'},
   Notario: {numero: 12, variableDeNombre: 'razon_social'},
   'Casa De Empeño ': {numero: 13, variableDeNombre: 'razon_social'},
   Agencia: {numero: 14, variableDeNombre: 'razon_social'},
+  Contribuyente: {numero: 15, variableDeNombre: 'nombre_completo'},
 };
 
 const CargosPadrones = ({route}) => {
@@ -96,9 +98,9 @@ const CargosPadrones = ({route}) => {
   // Redux
   const corte = useSelector(state => state.user.corte);
   const hasCorte = useSelector(state => Boolean(state.user.corte));
-  const entidadMunicipalConfig = useSelector(
-    state => state.user.entidad_municipal.configuracion,
-  );
+  // const entidadMunicipalConfig = useSelector(
+  //   state => state.user.entidad_municipal.configuracion,
+  // );
 
   const showAlert = (
     mensaje?: string,
@@ -120,6 +122,16 @@ const CargosPadrones = ({route}) => {
 
     return () => {
       unsubscribe();
+
+      setNameSearch([]);
+      setPadronCorrespondiente([]);
+      setResultCargos([]);
+      setResultArrCargos([]);
+      setResultPadrones([]);
+      setContribuyente({});
+      setImporteTotal(0);
+      setNombrePadron('');
+      setNumeroPadron(0);
     };
   }, []);
 
@@ -327,6 +339,8 @@ const CargosPadrones = ({route}) => {
       response = await getAgencia(searchData, formData);
     } else if (nombrePadron !== undefined) {
       response = await getEmpresa(searchData, formData, nombrePadron);
+    } else if (nombrePadron === 'Contribuyente') {
+      response = await getContribuyenteCaja(searchData);
     }
 
     if (!response || response[0] === undefined) {
@@ -377,7 +391,6 @@ const CargosPadrones = ({route}) => {
         ...nameSearch,
         padronData[datosExtraPadrones[nombrePadron]?.variableDeNombre],
       ]);
-
       setImporteTotal(
         importeTotal + Math.round((total + Number.EPSILON) * 100) / 100,
       );
@@ -388,6 +401,7 @@ const CargosPadrones = ({route}) => {
   //Maneja la funcion del boton de busqueda
   const handleSearch = (formData?: object) => {
     if ((searchText === null || searchText === '') && formData === undefined) {
+      setIsLoading(false);
       showAlert('Escriba algo en la busqueda');
     } else if (
       nombrePadron === 'Caja' ||
@@ -407,6 +421,7 @@ const CargosPadrones = ({route}) => {
   const handleSearchContribuyente = (formData?: object) => {
     if ((searchText === null || searchText === '') && formData === undefined) {
       showAlert('Escriba algo en la busqueda');
+      setIsLoading(false);
     } else {
       handleBuscarPadron(searchText, formData);
     }
@@ -433,7 +448,7 @@ const CargosPadrones = ({route}) => {
               );
               let recibos = await getRecibos(
                 contribuyente?.id,
-                [{metodo: 3, importe: importeTotal}],
+                [{metodo: 3, importe: importeTotal, banco: 'Netpay'}],
                 resultCargos?.flatMap((cargo, index) =>
                   cargo !== undefined
                     ? {

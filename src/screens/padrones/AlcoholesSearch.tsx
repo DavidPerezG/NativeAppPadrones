@@ -67,6 +67,7 @@ const AlcoholesSearch = () => {
 
     return () => {
       unsubscribe();
+      setListAlcoholes([]);
     };
   }, []);
 

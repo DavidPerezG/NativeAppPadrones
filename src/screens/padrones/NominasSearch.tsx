@@ -67,6 +67,7 @@ const NominasSearch = () => {
 
     return () => {
       unsubscribe();
+      setListNominas([]);
     };
   }, []);
 

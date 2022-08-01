@@ -53,7 +53,10 @@ const getRecibos = async (
     let response = await http.post('/recaudacion/recibos/', body);
     result = response.data;
   } catch (error) {
+    console.log(error);
     console.log(error.response.data);
+    // console.log(error.response.data.metodos_de_pago);
+    // console.log(error.response.data.metodos_de_pago[0].banco);
   }
   console.log('result recibos');
   console.log(result);

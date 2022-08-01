@@ -67,6 +67,7 @@ const CedularesSearch = () => {
 
     return () => {
       unsubscribe();
+      setListEmpresas([]);
     };
   }, []);
 

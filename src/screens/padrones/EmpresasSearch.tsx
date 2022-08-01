@@ -67,6 +67,7 @@ const EmpresasSearch = () => {
 
     return () => {
       unsubscribe();
+      setListEmpresas([]);
     };
   }, []);
 

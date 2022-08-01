@@ -20,6 +20,7 @@ const nameVarPadron = {
   Notario: 'razon_social',
   'Casa De Empeño ': 'razon_social',
   Agencia: 'razon_social',
+  Contribuyente: 'nombre_completo',
 };
 
 const TablaSeleccion = ({route}) => {
@@ -32,6 +33,8 @@ const TablaSeleccion = ({route}) => {
     setData(route.params.data);
     setNombrePadron(route.params.nombrePadron);
     listData();
+
+    return () => {};
   }, []);
 
   const listData = () => {};

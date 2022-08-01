@@ -1,7 +1,7 @@
 //External dependencies
 import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {ActivityIndicator, FlatList} from 'react-native';
+import {ActivityIndicator, FlatList, Text} from 'react-native';
 import styled from 'styled-components/native';
 import {DropdownAlertType} from 'react-native-dropdownalert';
 
@@ -33,6 +33,7 @@ const padronParams = {
     nav_page: 'casas-de-empenio-search',
   },
   'Juego De Azar': {icon_name: 'dice', nav_page: 'juegos-de-azar-search'},
+  Contribuyente: {icon_name: 'users', nav_page: ''},
 };
 
 const ListadoPadrones = () => {
@@ -57,6 +58,8 @@ const ListadoPadrones = () => {
   const fetchPadron = async () => {
     setIsLoading(true);
     const response = await getPadrones();
+    console.log('resss');
+    console.log(response);
     setPadrones(response);
     setIsLoading(false);
   };
@@ -75,6 +78,9 @@ const ListadoPadrones = () => {
 
   useEffect(() => {
     fetchPadron();
+    return () => {
+      setPadrones([]);
+    };
   }, []);
 
   return (
@@ -85,23 +91,27 @@ const ListadoPadrones = () => {
         onPressLeftButton={() => goBack()}
       />
       {isLoading ? <ActivityIndicator size={'large'} color="#235161" /> : null}
-      <FlatList
-        data={padrones}
-        renderItem={({item}) => (
-          <MenuCard
-            nombreItem={item.model}
-            iconName={padronParams[item.model].icon_name}
-            color="#3F3F3F"
-            unable={item.model === 'Predio'}
-            navPage={padronParams[item.model].nav_page}
-            handleClick={true}
-            navProps={navigation}
-          />
-        )}
-        keyExtractor={item => item.id.toString()}
-        numColumns={3}
-        contentContainerStyle={{flexGrow: 1, paddingHorizontal: 5}}
-      />
+      {padrones === [] || !padrones ? (
+        <Text>No hay Padrones a mostrar</Text>
+      ) : (
+        <FlatList
+          data={padrones}
+          renderItem={({item}) => (
+            <MenuCard
+              nombreItem={item.model}
+              iconName={padronParams[item.model]?.icon_name || ''}
+              color="#3F3F3F"
+              unable={item.model === 'Predio' || item.model === 'Contribuyente'}
+              navPage={padronParams[item.model]?.nav_page || 'home'}
+              handleClick={true}
+              navProps={navigation}
+            />
+          )}
+          keyExtractor={item => item.id.toString()}
+          numColumns={3}
+          contentContainerStyle={{flexGrow: 1, paddingHorizontal: 5}}
+        />
+      )}
     </Container>
   );
 };

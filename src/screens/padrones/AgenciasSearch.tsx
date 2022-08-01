@@ -16,28 +16,6 @@ import ModalSeleccionar from '../../components/padronesSearchComponents/ModalSel
 
 // Services
 import {getAgencias, deleteAgencia} from '../../services/empresas/agencias';
-import {getAlcoholes, deleteAlcohol} from '../../services/empresas/alcoholes';
-import {
-  getArrendamientos,
-  deleteArrendamiento,
-} from '../../services/empresas/arrendamientos';
-
-import {
-  getCasasDeEmpenio,
-  deleteCasaDeEmpenio,
-} from '../../services/empresas/casasDeEmpenio';
-import {getCedulares, deleteCedular} from '../../services/empresas/cedulares';
-import {getEmpresas, deleteEmpresas} from '../../services/empresas/empresas';
-import {
-  getHospedajes,
-  deleteHospedaje,
-} from '../../services/empresas/hospedajes';
-import {
-  deleteJuegoDeAzar,
-  getJuegosDeAzar,
-} from '../../services/empresas/juegosDeAzar';
-import {getNominas, deleteNomina} from '../../services/empresas/nominas';
-import {getNotarios, deleteNotario} from '../../services/empresas/notarios';
 
 // Types
 import {Empresa} from '../../types/empresaInterface';
@@ -89,6 +67,7 @@ const AgenciasSearch = () => {
 
     return () => {
       unsubscribe();
+      setListAgencias([]);
     };
   }, []);
 

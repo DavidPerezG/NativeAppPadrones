@@ -67,6 +67,8 @@ const NotariosSearch = () => {
 
     return () => {
       unsubscribe();
+
+      setListEmpresas([]);
     };
   }, []);
 

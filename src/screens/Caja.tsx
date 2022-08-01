@@ -23,6 +23,7 @@ const iconsCard = {
   Agencia: 'hotel',
   'Casa De Empeño ': 'funnel-dollar',
   'Juego De Azar': 'dice',
+  Contribuyente: 'user',
 };
 
 const Caja = () => {
@@ -44,6 +45,9 @@ const Caja = () => {
 
   useEffect(() => {
     fetchPadron();
+    return () => {
+      setPadrones([]);
+    };
   }, []);
 
   return (

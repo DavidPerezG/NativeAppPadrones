@@ -70,6 +70,7 @@ const CasasDeEmpenioSearch = () => {
 
     return () => {
       unsubscribe();
+      setListEmpresas([]);
     };
   }, []);
 

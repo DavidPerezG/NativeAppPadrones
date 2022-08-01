@@ -115,6 +115,10 @@ const VehiculosSearch = () => {
 
     return () => {
       unsubscribe();
+      setListVehiculos([]);
+      setEstadosVehiculo([]);
+      setServiciosVehiculos([]);
+      setTiposVehiculos([]);
     };
   }, []);
 

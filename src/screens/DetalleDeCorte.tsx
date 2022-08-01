@@ -135,7 +135,7 @@ const DetalleDeCorteScreen = () => {
   useEffect(() => {
     fetchData();
     return () => {
-      console.log('hola');
+      setMetodosDePago([]);
     };
   }, []);
   return (
